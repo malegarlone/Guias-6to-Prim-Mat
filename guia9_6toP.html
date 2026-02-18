@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 9: Números Gigantes y Aproximación - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-red: #993921;
+            --bg-light: #fdfaf6;
+            --white: #ffffff;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 600px;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.8rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.3rem;
+            color: #444;
+            max-width: 780px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.2rem;
+            border-radius: 15px;
+            background: var(--white);
+            margin: 0.8rem 0;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-yellow);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 250;
+            border: 2px solid #eee;
+            color: var(--primary-blue-dark);
+            font-size: 2rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.15);
+            background-color: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 15px;
+        }
+
+        #next-btn {
+            right: 15px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue-dark);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary-yellow), var(--primary-orange));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .pos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .pos-table th {
+            background: var(--primary-blue-dark);
+            color: white;
+            padding: 0.8rem;
+            border: 1px solid #334e68;
+        }
+
+        .pos-table td {
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            font-weight: bold;
+            color: var(--primary-orange);
+        }
+
+        .period-header {
+            background: var(--primary-orange) !important;
+            font-size: 1.1rem;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: var(--white);
+            cursor: pointer;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--primary-blue-dark);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .emoji-box {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+        }
+
+        .nice-phrase {
+            font-style: italic;
+            color: var(--primary-orange);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .number-input {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue-dark);
+            border: none;
+            border-bottom: 4px solid var(--primary-yellow);
+            background: transparent;
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            margin: 1.5rem 0;
+            letter-spacing: 2px;
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 40px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Escolaris - Matemática 6&deg; Primaria</span>
+            <span>Lección 9: Números Gigantes y Aproximación</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div class="emoji-box">🏗️🔢</div>
+                    <h1>Arquitectos Numéricos</h1>
+                    <h2 style="color: var(--primary-orange);">El universo de las grandes cifras</h2>
+                    <p class="nice-phrase">✨ ¡Tu ingenio es más grande que cualquier número! ✨</p>
+                </div>
+
+                <!-- Slide 2: Contexto -->
+                <div class="slide">
+                    <div class="emoji-box">🌌</div>
+                    <h2>¿Hasta dónde podemos contar?</h2>
+                    <p>En el universo hay millones de estrellas, y en la Tierra, ¡miles de millones de personas!</p>
+                    <div class="info-card">
+                        <p>⭐️ <strong>Población Mundial:</strong> ~8,000,000,000 personas.</p>
+                        <p>📏 <strong>Distancia al Sol:</strong> ~150,000,000 kilómetros.</p>
+                    </div>
+                    <p class="nice-phrase">¡Eres un explorador de lo infinito! 🚀</p>
+                </div>
+
+                <!-- Slide 3: Misión -->
+                <div class="slide">
+                    <div class="emoji-box">🎯</div>
+                    <h2>Nuestra Misión</h2>
+                    <div class="info-card">
+                        <ul style="list-style: none; text-align: left; font-size: 1.2rem;">
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Dominar</strong> cifras de más de 9 dígitos.
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Identificar</strong> el valor posicional.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Aproximar</strong> números con precisión.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Conjuntos Numéricos -->
+                <div class="slide">
+                    <div class="emoji-box">🏛️</div>
+                    <h2>Conjuntos Numéricos</h2>
+                    <p>Los números que usamos para contar se llaman <strong>Números Naturales (N)</strong>.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-orange);">
+                        <p>N = {0, 1, 2, 3, 4, 5... hasta el infinito}</p>
+                    </div>
+                    <p>Para números gigantes, los organizamos en <strong>clases</strong> y <strong>periodos</strong>.
+                    </p>
+                </div>
+
+                <!-- Slide 5: Valor Posicional -->
+                <div class="slide">
+                    <div class="emoji-box">📊</div>
+                    <h2>El Mapa Posicional</h2>
+                    <table class="pos-table">
+                        <tr>
+                            <th colspan="3" class="period-header">Periodo de Millones</th>
+                            <th colspan="3" class="period-header">Periodo de Unidades</th>
+                        </tr>
+                        <tr>
+                            <th>C. de Millón</th>
+                            <th>D. de Millón</th>
+                            <th>U. de Millón</th>
+                            <th>Centenas</th>
+                            <th>Decenas</th>
+                            <th>Unidades</th>
+                        </tr>
+                        <tr>
+                            <td>100,000,000</td>
+                            <td>10,000,000</td>
+                            <td>1,000,000</td>
+                            <td>100</td>
+                            <td>10</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+                    <p>¡Cada 3 lugares, cambiamos de clase usando un espacio o una coma!</p>
+                </div>
+
+                <!-- Slide 6: Visualizador Interactivo -->
+                <div class="slide">
+                    <div class="emoji-box">🖋️</div>
+                    <h2>Lectura de Números</h2>
+                    <p>Escribe cualquier número gigante para ver cómo se lee:</p>
+                    <input type="text" class="number-input" id="big-number" placeholder="Ej: 125430000" maxlength="12"
+                        oninput="updateReading()">
+                    <div class="info-card" id="reading-result"
+                        style="background: var(--bg-light); border-color: var(--primary-blue-dark); min-height: 80px;">
+                        <em>¡Escribe algo genial arriba!</em>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Billones (Millardos) -->
+                <div class="slide">
+                    <div class="emoji-box">💎</div>
+                    <h2>¡Más allá de los Millones!</h2>
+                    <p>Después de los 999 millones, llegamos a los <strong>Millardos</strong> o <strong>Mil
+                            Millones</strong>.</p>
+                    <div class="info-card" style="background: var(--primary-blue-dark); color: white;">
+                        <p style="font-size: 1.8rem; color: var(--primary-yellow); font-weight: 800;">1,000,000,000</p>
+                        <p style="color: white;">¡Nueve ceros para un millardo!</p>
+                    </div>
+                    <p class="nice-phrase">✨ ¡Tu valor es astronómico! ✨</p>
+                </div>
+
+                <!-- Slide 8: Escritura Correcta -->
+                <div class="slide">
+                    <div class="emoji-box">📝</div>
+                    <h2>Reglas de Escritura</h2>
+                    <p>Para escribir bien números gigantes:</p>
+                    <div class="info-card" style="text-align: left;">
+                        <p>1️⃣ Agrupa de 3 en 3 de derecha a izquierda.</p>
+                        <p>2️⃣ Al leer, usa las palabras "millón" o "mil" donde corresponda.</p>
+                        <p>3️⃣ ¡No olvides que el cero también ocupa un lugar!</p>
+                    </div>
+                </div>
+
+                <!-- Slide 9: Aproximación -->
+                <div class="slide">
+                    <div class="emoji-box">🔍</div>
+                    <h2>Aproximación (Redondeo)</h2>
+                    <p>Sirve para facilitar el manejo de números. Es como dar un "valor estimado".</p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <div class="info-card" style="border-left-color: #10b981;">
+                            <strong>Real:</strong> 9,870,500
+                        </div>
+                        <div class="info-card" style="border-left-color: var(--primary-orange);">
+                            <strong>Aproximado:</strong> ~10,000,000
+                        </div>
+                    </div>
+                    <p class="nice-phrase">🌈 ¡Tu precisión es impresionante! 🌈</p>
+                </div>
+
+                <!-- Slide 10: La Regla del 5 -->
+                <div class="slide">
+                    <div class="emoji-box">⚖️</div>
+                    <h2>La Regla de Oro</h2>
+                    <p>Mira el número a la derecha de la posición que quieres redondear:</p>
+                    <div class="info-card" style="text-align: left;">
+                        <p>🔼 <strong>Si es 5 o mayor:</strong> El de la izquierda SUBE 1.</p>
+                        <p>⏹️ <strong>Si es menor que 5:</strong> El de la izquierda SE QUEDA igual.</p>
+                    </div>
+                    <p>¡El resto de los números a la derecha se vuelven CEROS!</p>
+                </div>
+
+                <!-- Slide 11: Reto Veloz 1 -->
+                <div class="slide">
+                    <div class="emoji-box">🧠</div>
+                    <h2>¡Reto de Lectura!</h2>
+                    <p>¿Cómo se lee el número <strong>500,000,000</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, '¡Casi! Tiene demasiados ceros para eso.', 'Cincuenta millones')">A)
+                            Cincuenta millones</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, true, this, '¡Excelente! Medio millardo o quinientos millones.', 'Quinientos millones')">B)
+                            Quinientos millones</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, 'Esos serían 5 ceros nada más.', 'Cinco mil')">C) Cinco
+                            mil</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 12: Reto de Aproximación -->
+                <div class="slide">
+                    <div class="emoji-box">⚡</div>
+                    <h2>Redondeo Veloz</h2>
+                    <p>Aproxima <strong>12,800,000</strong> a la decena de millón más cercana:</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, true, this, '¡Genial! Como el 2 es menor que 5, se queda en diez.', '10,000,000')">10,000,000</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, false, this, 'Para subir a 20 necesito que después del 1 haya un 5 o más.', '20,000,000')">20,000,000</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 13: Reflexión -->
+                <div class="slide">
+                    <div class="emoji-box">💡</div>
+                    <h2>Pensamiento Gigante</h2>
+                    <div class="info-card" style="text-align: left;">
+                        <p>💰 ¿Por qué los bancos necesitan números gigantes?</p>
+                        <p>🌍 ¿Qué pasaría si no pudiéramos aproximar números?</p>
+                        <p>✨ ¡Piensa en la cifra más grande que puedas imaginar! ¿Cómo se llamaría?</p>
+                    </div>
+                </div>
+
+                <!-- Slide 14: Cierre -->
+                <div class="slide">
+                    <div class="emoji-box">🏆</div>
+                    <h2>¡Gobernante de Números!</h2>
+                    <p>Ahora dominas las cifras que mueven al mundo entero.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1.2rem 2.5rem; border-radius: 40px; font-weight: 700; cursor: pointer; margin-top: 2rem; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(219, 96, 21, 0.3);">Volver
+                        a Empezar 🔄</button>
+                    <p class="nice-phrase" style="margin-top: 2rem;">🌟 ¡Tu potencial no tiene límites numéricos! 🌟</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 14</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function checkQuiz(qId, isCorrect, btn, message, optionText) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const redColor = "#993921";
+            if (isCorrect) {
+                btn.style.background = "#d1fae5";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = "🌟 " + message;
+                feedback.style.color = "#059669";
+                const btns = btn.parentElement.querySelectorAll('.option-btn');
+                btns.forEach(b => { if (b !== btn) b.style.opacity = "0.5"; b.disabled = true; });
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = redColor;
+                feedback.innerHTML = "❌ " + message;
+                feedback.style.color = redColor;
+                btn.disabled = true;
+            }
+        }
+
+        function updateReading() {
+            const input = document.getElementById('big-number');
+            const result = document.getElementById('reading-result');
+            const val = input.value.replace(/\D/g, '');
+            input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+            if (val === '') {
+                result.innerHTML = '<em>¡Escribe algo genial arriba!</em>';
+                return;
+            }
+
+            let text = '';
+            if (val.length <= 3) text = "Cientos";
+            else if (val.length <= 6) text = "Miles";
+            else if (val.length <= 9) text = "¡Millones!";
+            else text = "¡Millardos (Mil Millones)!";
+
+            result.innerHTML = `<strong>Magnitud:</strong> ${text}<br><small>Sigue practicando la lectura por grupos de 3.</small>`;
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

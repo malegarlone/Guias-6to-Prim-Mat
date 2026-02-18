@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 5: Área y Volumen de Sólidos Geométricos - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-red: #993921;
+            --bg-light: #f0f8ff;
+            --white: #ffffff;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 600px;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 40px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.8rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.3rem;
+            color: #444;
+            max-width: 750px;
+            line-height: 1.6;
+        }
+
+        .info-card {
+            padding: 1.8rem;
+            border-radius: 15px;
+            background: var(--white);
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-yellow);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 250;
+            border: 2px solid #eee;
+            color: var(--primary-blue-dark);
+            font-size: 2rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.15);
+            background-color: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 15px;
+        }
+
+        #next-btn {
+            right: 15px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue-dark);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary-yellow), var(--primary-orange));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1.5rem auto;
+        }
+
+        .option-btn {
+            padding: 1.2rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            background: var(--white);
+            cursor: pointer;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--primary-blue-dark);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+            transform: translateY(-2px);
+        }
+
+        .emoji-box {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+        }
+
+        .math-concept {
+            background: var(--primary-blue-dark);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            display: inline-block;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            margin: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 40px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            #prev-btn {
+                left: 5px;
+            }
+
+            #next-btn {
+                right: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Escolaris - Matemática 6&deg; Primaria</span>
+            <span>Lección 5: Sólidos Geométricos</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Portada -->
+                <div class="slide active">
+                    <div class="emoji-box">🎨📏</div>
+                    <h1>Área y Volumen</h1>
+                    <h2 style="color: var(--primary-orange);">Sólidos Geométricos</h2>
+                    <div class="info-card" style="border-left: none; background: transparent; box-shadow: none;">
+                        <p style="font-weight: 600;">✨ ¡Aprender matemáticas puede ser una gran aventura! ✨</p>
+                    </div>
+                </div>
+
+                <!-- Objetivos -->
+                <div class="slide">
+                    <div class="emoji-box">🎯</div>
+                    <h2>Nuestra Misión de Hoy</h2>
+                    <div class="info-card">
+                        <ul style="list-style: none; text-align: left; font-size: 1.3rem;">
+                            <li style="margin-bottom: 1rem;">✅ <strong>Identificar</strong> diferentes sólidos
+                                geométricos en nuestra vida diaria.</li>
+                            <li style="margin-bottom: 1rem;">✅ <strong>Calcular</strong> el área total de prismas y
+                                cubos.</li>
+                            <li style="margin-bottom: 1rem;">✅ <strong>Descubrir</strong> cómo medir el volumen de los
+                                objetos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Activación -->
+                <div class="slide">
+                    <div class="emoji-box">🤔</div>
+                    <h2>¿Sabías que...?</h2>
+                    <p>Todo lo que nos rodea tiene 3 dimensiones: <strong>largo, ancho y alto.</strong></p>
+                    <div style="display: flex; gap: 2rem; margin-top: 2rem;">
+                        <div class="info-card" style="flex: 1;">
+                            <strong>2D (Plano)</strong><br>📄 Una hoja de papel<br>(Solo tiene área)
+                        </div>
+                        <div class="info-card" style="flex: 1; border-left-color: var(--primary-orange);">
+                            <strong>3D (Sólido)</strong><br>📦 Una caja de regalo<br>(¡Tiene volumen!)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explicación: Área -->
+                <div class="slide">
+                    <div class="emoji-box">📦</div>
+                    <h2>¿Qué es el Área Total?</h2>
+                    <p>Imagina que quieres forrar una caja con papel de regalo. El <strong>Área Total</strong> es la
+                        suma de las áreas de todas sus "caras".</p>
+                    <div class="info-card" style="background: #fff8f0; border: 2px dashed var(--primary-orange);">
+                        <p>💡 <strong>Truco:</strong> ¡Es como desarmar la caja y medir cada pedazo!</p>
+                    </div>
+                </div>
+
+                <!-- Nuevas Fórmulas de Áreas 2D - Parte 1 -->
+                <div class="slide">
+                    <div class="emoji-box">📐</div>
+                    <h2>Figuras Planas (1/2)</h2>
+
+                    <div style="margin-bottom: 1rem;">
+                        <svg width="320" height="100" viewBox="0 0 320 100"
+                            style="background:#fff; border-radius:12px; padding:10px; border:2px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <!-- Romboide -->
+                            <path d="M20 80 L100 80 L120 30 L40 30 Z" fill="#fffcf9" stroke="#db6015"
+                                stroke-width="2" />
+                            <text x="50" y="95" font-size="12" fill="#444" font-weight="600">Base</text>
+                            <line x1="40" y1="30" x2="40" y2="80" stroke="#993921" stroke-dasharray="3,3" />
+                            <text x="25" y="60" font-size="12" fill="#993921" font-weight="bold">h</text>
+
+                            <!-- Trapecio -->
+                            <path d="M180 80 L280 80 L250 30 L210 30 Z" fill="#fffcf9" stroke="#f7be00"
+                                stroke-width="2" />
+                            <text x="210" y="95" font-size="11" fill="#444" font-weight="600">Base (B)</text>
+                            <text x="220" y="22" font-size="11" fill="#444" font-weight="600">base (b)</text>
+                            <line x1="210" y1="30" x2="210" y2="80" stroke="#993921" stroke-dasharray="3,3" />
+                            <text x="195" y="60" font-size="12" fill="#993921" font-weight="bold">h</text>
+                        </svg>
+                    </div>
+
+                    <div
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; max-width: 800px;">
+                        <div class="info-card" style="border-left-color: var(--primary-red); padding: 1.2rem;">
+                            <strong>Romboide:</strong><br>A = Base × h
+                        </div>
+                        <div class="info-card" style="border-left-color: var(--primary-orange); padding: 1.2rem;">
+                            <strong>Trapecio:</strong><br>A = [(B + b) × h] / 2
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nuevas Fórmulas de Áreas 2D - Parte 2 -->
+                <div class="slide">
+                    <div class="emoji-box">🛑</div>
+                    <h2>Figuras Planas (2/2)</h2>
+
+                    <div style="margin-bottom: 1rem;">
+                        <svg width="150" height="120" viewBox="0 0 150 120"
+                            style="background:#fff; border-radius:12px; padding:10px; border:2px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <path d="M75 10 L120 45 L105 100 L45 100 L30 45 Z" fill="#fffcf9" stroke="#244b5a"
+                                stroke-width="2" />
+                            <line x1="75" y1="60" x2="75" y2="100" stroke="#db6015" stroke-width="2" />
+                            <text x="80" y="85" font-size="12" fill="#db6015" font-weight="bold">Apotema</text>
+                        </svg>
+                    </div>
+
+                    <div class="info-card" style="border-left-color: var(--primary-yellow); width: 80%;">
+                        <strong>Pentágono Regular:</strong><br>A = (Perímetro × Apotema) / 2
+                    </div>
+                </div>
+
+                <!-- Explicación: Volumen -->
+                <div class="slide">
+                    <div class="emoji-box">🧊</div>
+                    <h2>¿Qué es el Volumen?</h2>
+                    <p>Es el espacio que ocupa un cuerpo. Imagina cuántos cubitos pequeños caben dentro de una caja
+                        grande.</p>
+                    <div class="math-concept">V = Largo × Ancho × Alto</div>
+                    <p style="margin-top: 1rem; font-size: 1.1rem;">Se mide en unidades "cúbicas" como
+                        <strong>cm³</strong> o <strong>m³</strong>.
+                    </p>
+                </div>
+
+                <!-- Nuevas Fórmulas de Volumen 3D - Parte 1 -->
+                <div class="slide">
+                    <div class="emoji-box">🌋</div>
+                    <h2>Volumen: Pirámide</h2>
+
+                    <div style="margin-bottom: 1rem;">
+                        <svg width="180" height="130" viewBox="0 0 180 130"
+                            style="background:#fff; border-radius:12px; padding:10px; border:2px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <path d="M30 110 L130 110 L80 20 Z" fill="#fffcf9" stroke="#db6015" stroke-width="2" />
+                            <path d="M80 120 L150 100 L80 20 Z" fill="none" stroke="#db6015" stroke-width="1"
+                                stroke-dasharray="2,2" />
+                            <line x1="80" y1="20" x2="80" y2="110" stroke="#993921" stroke-dasharray="4,4"
+                                stroke-width="2" />
+                            <text x="85" y="70" font-size="12" fill="#993921" font-weight="bold">h (Altura)</text>
+                        </svg>
+                    </div>
+
+                    <div class="info-card" style="border-left-color: var(--primary-red); width: 80%;">
+                        <strong>Pirámide:</strong><br>V = (Área base × h) / 3
+                    </div>
+                </div>
+
+                <!-- Nuevas Fórmulas de Volumen 3D - Parte 2 -->
+                <div class="slide">
+                    <div class="emoji-box">🍦</div>
+                    <h2>Volumen: Cono</h2>
+
+                    <div style="margin-bottom: 1rem;">
+                        <svg width="180" height="130" viewBox="0 0 180 130"
+                            style="background:#fff; border-radius:12px; padding:10px; border:2px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                            <ellipse cx="90" cy="110" rx="60" ry="20" fill="#fffcf9" stroke="#244b5a"
+                                stroke-width="2" />
+                            <line x1="90" y1="110" x2="150" y2="110" stroke="#db6015" stroke-width="3" />
+                            <text x="105" y="125" font-size="12" fill="#db6015" font-weight="bold">r (Radio)</text>
+                            <line x1="90" y1="20" x2="90" y2="110" stroke="#993921" stroke-dasharray="4,4"
+                                stroke-width="2" />
+                            <text x="40" y="70" font-size="12" fill="#993921" font-weight="bold">h (Altura)</text>
+                            <path d="M30 110 L90 20 L150 110" fill="none" stroke="#244b5a" stroke-width="2" />
+                        </svg>
+                    </div>
+
+                    <div class="info-card" style="border-left-color: var(--primary-blue-dark); width: 80%;">
+                        <strong>Cono:</strong><br>V = (&pi; × r² × h) / 3
+                    </div>
+                    <p style="font-size: 1rem; margin-top: 0.5rem;">🌟 ¡Caben 3 conos en un cilindro de la misma base!
+                    </p>
+                </div>
+
+                <!-- Ejemplo Práctico -->
+                <div class="slide">
+                    <div class="emoji-box">🏫</div>
+                    <h2>¡Vamos a calcular!</h2>
+                    <p>Si tenemos un cubo que mide <strong>3 cm</strong> por cada lado:</p>
+                    <div class="info-card">
+                        <p>📏 <strong>Volumen:</strong> 3cm × 3cm × 3cm = <strong>27 cm³</strong></p>
+                        <p>✨ ¡Es súper fácil si lo haces paso a paso!</p>
+                    </div>
+                </div>
+
+                <!-- Quiz 1 -->
+                <div class="slide">
+                    <div class="emoji-box">🎮</div>
+                    <h2>¡Reto Relámpago!</h2>
+                    <p>¿En qué unidades medimos el <strong>volumen</strong> de un objeto?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, '¡Ups! Eso es para longitud.', 'Unidades cuadradas (cm²)')">A)
+                            Unidades cuadradas (cm²)</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, true, this, '¡Excelente! Los cubitos miden espacio 3D.', 'Unidades cúbicas (cm³)')">B)
+                            Unidades cúbicas (cm³)</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, '¡Cuidado! Solo medimos el borde así.', 'Centímetros lineales (cm)')">C)
+                            Centímetros lineales (cm)</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Meta-cognición -->
+                <div class="slide">
+                    <div class="emoji-box">🌟</div>
+                    <h2>¿Qué aprendimos hoy?</h2>
+                    <div class="info-card" style="text-align: left;">
+                        <p>🌈 ¿Cuál es la diferencia entre un cuadrado y un cubo?</p>
+                        <p>📦 ¿En qué lugar de tu casa puedes encontrar un prisma?</p>
+                        <p>🚀 ¿Te sientes listo para medir el mundo?</p>
+                    </div>
+                </div>
+
+                <!-- Cierre -->
+                <div class="slide">
+                    <div class="emoji-box">🥳</div>
+                    <h2>¡Increíble Trabajo!</h2>
+                    <p>Has completado la lección de hoy. Sigue practicando y verás que las matemáticas son geniales.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1.2rem 2.5rem; border-radius: 40px; font-weight: 700; cursor: pointer; margin-top: 2rem; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(219, 96, 21, 0.3);">Volver
+                        a Empezar 🔄</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 9</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function checkQuiz(qId, isCorrect, btn, message, optionText) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const redColor = "#993921";
+            if (isCorrect) {
+                btn.style.background = "#d1fae5";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = "🌟 " + message;
+                feedback.style.color = "#059669";
+                // Deshabilitar otros
+                const btns = btn.parentElement.querySelectorAll('.option-btn');
+                btns.forEach(b => { if (b !== btn) b.style.opacity = "0.5"; b.disabled = true; });
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = redColor;
+                feedback.innerHTML = "❌ " + message;
+                feedback.style.color = redColor;
+                btn.disabled = true;
+            }
+        }
+
+        // Touch support
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 50) nextSlide();
+            if (touchEndX > touchStartX + 50) prevSlide();
+        }, false);
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 8: Conjuntos y Producto Cartesiano - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-red: #993921;
+            --bg-light: #f0f8ff;
+            --white: #ffffff;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 600px;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.8rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.3rem;
+            color: #444;
+            max-width: 780px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.2rem;
+            border-radius: 15px;
+            background: var(--white);
+            margin: 0.8rem 0;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-yellow);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 250;
+            border: 2px solid #eee;
+            color: var(--primary-blue-dark);
+            font-size: 2rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.15);
+            background-color: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 15px;
+        }
+
+        #next-btn {
+            right: 15px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue-dark);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary-yellow), var(--primary-orange));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .venn-area {
+            cursor: pointer;
+            transition: fill 0.3s;
+        }
+
+        .venn-area:hover {
+            fill-opacity: 0.5;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: var(--white);
+            cursor: pointer;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--primary-blue-dark);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .emoji-box {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+        }
+
+        .nice-phrase {
+            font-style: italic;
+            color: var(--primary-orange);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 40px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Producto Cartesiano Interactivo */
+        .cartesian-pair {
+            display: inline-block;
+            background: var(--primary-orange);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            margin: 0.2rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            animation: popIn 0.3s ease-out forwards;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .set-box {
+            border: 2px solid var(--primary-blue-dark);
+            padding: 1rem;
+            border-radius: 12px;
+            background: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .relation-arrow {
+            stroke: var(--primary-orange);
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrow-head);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Escolaris - Matemática 6&deg; Primaria</span>
+            <span>Lección 8: Conjuntos y Producto Cartesiano</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div class="emoji-box">🧮🤝</div>
+                    <h1>El Club de los Conjuntos</h1>
+                    <h2 style="color: var(--primary-orange);">Agrupando ideas matemáticas</h2>
+                    <p class="nice-phrase">✨ ¡Tu mente organiza el mundo con maestría! ✨</p>
+                </div>
+
+                <!-- Slide 2: ¿Qué es un conjunto? -->
+                <div class="slide">
+                    <div class="emoji-box">🎒</div>
+                    <h2>¿Qué es un Conjunto?</h2>
+                    <p>Es una colección de objetos que comparten una característica especial. Cada objeto es un
+                        <strong>elemento</strong>.
+                    </p>
+                    <div class="info-card">
+                        <p>🍎 <strong>Conjunto F:</strong> Manzanas, Peras, Bananos...</p>
+                        <p>📏 <strong>Conjunto Ú:</strong> Lápiz, Regla, Borrador...</p>
+                    </div>
+                    <p class="nice-phrase">¡Eres un experto clasificador! 🧐</p>
+                </div>
+
+                <!-- Slide 3: Misión de hoy -->
+                <div class="slide">
+                    <div class="emoji-box">🎯</div>
+                    <h2>Nuestra Misión</h2>
+                    <div class="info-card">
+                        <ul style="list-style: none; text-align: left; font-size: 1.2rem;">
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Unir e Intersecar</strong> conjuntos como un
+                                pro.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Encontrar subconjuntos</strong> ocultos.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Crear parejas</strong> con el Producto
+                                Cartesiano.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Subconjuntos -->
+                <div class="slide">
+                    <div class="emoji-box">🥚🥚</div>
+                    <h2>Subconjuntos</h2>
+                    <p>Es cuando un conjunto pequeño vive dentro de uno más grande.</p>
+                    <div style="margin: 1rem 0;">
+                        <svg width="240" height="150" viewBox="0 0 240 150">
+                            <!-- Conjunto A (Grande) -->
+                            <ellipse cx="120" cy="75" rx="100" ry="60" fill="none" stroke="#244b5a" stroke-width="3"
+                                stroke-dasharray="5,5" />
+                            <text x="30" y="30" font-weight="bold" fill="#244b5a">Conjunto A</text>
+
+                            <!-- Conjunto B (Subconjunto) -->
+                            <ellipse cx="150" cy="85" rx="50" ry="35" fill="#f7be00" fill-opacity="0.2" stroke="#db6015"
+                                stroke-width="2" />
+                            <text x="140" y="85" font-weight="bold" fill="#db6015">B</text>
+                        </svg>
+                    </div>
+                    <p>¡Decimos que <strong>B está contenido en A</strong>! (B ⊆ A)</p>
+                </div>
+
+                <!-- Slide 5: Unión (A ∪ B) -->
+                <div class="slide">
+                    <div class="emoji-box">🤝</div>
+                    <h2>Unión de Conjuntos (A ∪ B)</h2>
+                    <p>¡Es invitar a todos a la misma fiesta! Juntamos los elementos de ambos grupos.</p>
+                    <div style="margin: 1rem 0;">
+                        <svg width="240" height="150" viewBox="0 0 240 150">
+                            <!-- Unión iluminada -->
+                            <circle cx="80" cy="75" r="50" fill="#db6015" fill-opacity="0.8" stroke="#444" />
+                            <circle cx="160" cy="75" r="50" fill="#db6015" fill-opacity="0.8" stroke="#444" />
+                            <text x="70" y="75" fill="white" font-weight="bold">A</text>
+                            <text x="155" y="75" fill="white" font-weight="bold">B</text>
+                        </svg>
+                    </div>
+                    <p class="nice-phrase">🤝 ¡La unión hace la fuerza matemática! 🤝</p>
+                </div>
+
+                <!-- Slide 6: Intersección (A ∩ B) -->
+                <div class="slide">
+                    <div class="emoji-box">💎</div>
+                    <h2>Intersección (A ∩ B)</h2>
+                    <p>¡Solo los que tienen ALGO en común! Es la parte donde los círculos se cruzan.</p>
+                    <div style="margin: 1rem 0;">
+                        <svg width="240" height="150" viewBox="0 0 240 150">
+                            <defs>
+                                <clipPath id="intersectClip">
+                                    <circle cx="160" cy="75" r="50" />
+                                </clipPath>
+                            </defs>
+                            <circle cx="80" cy="75" r="50" fill="none" stroke="#444" stroke-width="2" />
+                            <circle cx="160" cy="75" r="50" fill="none" stroke="#444" stroke-width="2" />
+                            <circle cx="80" cy="75" r="50" fill="#244b5a" clip-path="url(#intersectClip)" />
+                            <text x="50" y="75" font-weight="bold">A</text>
+                            <text x="175" y="75" font-weight="bold">B</text>
+                        </svg>
+                    </div>
+                    <p>¿Qué elementos están en ambos? ¡Esa es la intersección!</p>
+                </div>
+
+                <!-- Slide 7: El Producto Cartesiano Interactivo -->
+                <div class="slide">
+                    <div class="emoji-box">👫</div>
+                    <h2>Producto Cartesiano (A × B)</h2>
+                    <p>Haz clic en los elementos de <strong>A</strong> para ver sus parejas:</p>
+
+                    <div
+                        style="display: flex; align-items: center; justify-content: center; gap: 2rem; margin: 1rem 0;">
+                        <!-- Conjunto A -->
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="set-box" id="item-a1" onclick="showPairs(1)"
+                                style="cursor: pointer; transition: 0.3s;">Conjunto A: { 1 }</div>
+                            <div class="set-box" id="item-a2" onclick="showPairs(2)"
+                                style="cursor: pointer; transition: 0.3s;">Conjunto A: { 2 }</div>
+                        </div>
+
+                        <!-- Flechas SVG -->
+                        <svg width="100" height="120" viewBox="0 0 100 120">
+                            <defs>
+                                <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="9" refY="3"
+                                    orientation="auto" markerUnits="strokeWidth">
+                                    <path d="M0,0 L0,6 L9,3 z" fill="var(--primary-orange)" />
+                                </marker>
+                            </defs>
+                            <line id="arrow-1-a" x1="0" y1="25" x2="100" y2="25" class="relation-arrow" />
+                            <line id="arrow-1-b" x1="0" y1="25" x2="100" y2="95" class="relation-arrow" />
+                            <line id="arrow-2-a" x1="0" y1="95" x2="100" y2="25" class="relation-arrow" />
+                            <line id="arrow-2-b" x1="0" y1="95" x2="100" y2="95" class="relation-arrow" />
+                        </svg>
+
+                        <!-- Conjunto B -->
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="set-box" style="background: #f8fafc;">Conjunto B: { x }</div>
+                            <div class="set-box" style="background: #f8fafc;">Conjunto B: { y }</div>
+                        </div>
+                    </div>
+
+                    <div id="pairs-result" style="min-height: 50px; padding: 0.5rem;">
+                        <!-- Aquí aparecen las parejas -->
+                    </div>
+                    <p class="nice-phrase">🌈 ¡Cada flecha crea una nueva pareja! 🌈</p>
+                </div>
+
+                <!-- Slide 8: Diagrama de Árbol -->
+                <div class="slide">
+                    <div class="emoji-box">🌳</div>
+                    <h2>¿Cómo ver las parejas?</h2>
+                    <p>Usamos un diagrama de árbol para no olvidar a nadie:</p>
+                    <div class="info-card" style="text-align: left;">
+                        <p>🔵 Elemento 1 de A ➡️ {se une con b1, b2, b3...}</p>
+                        <p>🔴 Elemento 2 de A ➡️ {se une con b1, b2, b3...}</p>
+                    </div>
+                </div>
+
+                <!-- Slide 9: Reto de Intersección -->
+                <div class="slide">
+                    <div class="emoji-box">🔍</div>
+                    <h2>¡Misterio en el Venn!</h2>
+                    <p>Si A = {Perros, Gatos} y B = {Gatos, Peces}</p>
+                    <div class="info-card" style="background: var(--bg-light);">
+                        <p>¿Qué elemento está en <strong>A ∩ B</strong>?</p>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="option-btn" onclick="revealSolution(this)">¿Quién se repite? 🕵️‍♂️</button>
+                        <div class="reveal-content"
+                            style="display:none; background:#d1fae5; padding:1rem; border-radius:12px; margin-top:1rem; color:#059669; font-weight:800; font-size:1.5rem;">
+                            ¡GATOS! 🐱
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 10: Quiz de Producto Cartesiano -->
+                <div class="slide">
+                    <div class="emoji-box">🧠</div>
+                    <h2>¡Reto Veloz 1!</h2>
+                    <p>Si A={Rojo} y B={Auto, Bici}. ¿Cuántas parejas tiene A × B?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, '¡No! Rojo debe unirse con cada uno de B.', '1 pareja')">1
+                            pareja</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, true, this, '¡Correcto! (Rojo, Auto) y (Rojo, Bici).', '2 parejas')">2
+                            parejas</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, 'Solo hay dos opciones en B.', '3 parejas')">3
+                            parejas</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 11: Reto Veloz 2 (Unión) -->
+                <div class="slide">
+                    <div class="emoji-box">⚡</div>
+                    <h2>¡Reto Veloz 2!</h2>
+                    <p>Si A={1, 2} y B={2, 3}. ¿Cuál es el conjunto <strong>A ∪ B</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, false, this, '¡Ups! Falta el número 3.', '{1, 2}')">{1, 2}</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, true, this, '¡Excelente! La unión junta todos sin repartir el 2.', '{1, 2, 3}')">{1,
+                            2, 3}</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, false, this, 'Esa sería la intersección.', '{2}')">{2}</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 12: Reto Veloz 3 (Subconjuntos) -->
+                <div class="slide">
+                    <div class="emoji-box">🧐</div>
+                    <h2>¡Reto Veloz 3!</h2>
+                    <p>Si P={Aves} y Q={Pingüinos}. ¿Cuál afirmación es correcta?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(3, true, this, '¡Exacto! Todos los pingüinos son aves.', 'Q ⊆ P (Q está en P)')">Q
+                            ⊆ P (Q está en P)</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(3, false, this, 'No todas las aves son pingüinos.', 'P ⊆ Q (P está en Q)')">P
+                            ⊆ Q (P está en Q)</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(3, false, this, '¡Claro que tienen relación!', 'No tienen relación')">No
+                            tienen relación</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 13: Reflexión -->
+                <div class="slide">
+                    <div class="emoji-box">💡</div>
+                    <h2>Pensamiento Maestro</h2>
+                    <div class="info-card" style="text-align: left;">
+                        <p>🎒 ¿Cómo usarías los conjuntos para ordenar tu mochila?</p>
+                        <p>🍎 ¿Qué pasa si la intersección de dos conjuntos es vacía ∅?</p>
+                        <p>👫 Si haces un producto cartesiano de tus amigos y sus helados favoritos, ¿cuántas opciones
+                            tendrías?</p>
+                    </div>
+                </div>
+
+                <!-- Slide 14: Cierre -->
+                <div class="slide">
+                    <div class="emoji-box">🏆</div>
+                    <h2>¡Líder de Conjuntos!</h2>
+                    <p>Has demostrado que tienes una mente organizada y brillante.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1.2rem 2.5rem; border-radius: 40px; font-weight: 700; cursor: pointer; margin-top: 2rem; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(219, 96, 21, 0.3);">Volver
+                        a Empezar 🔄</button>
+                    <p class="nice-phrase" style="margin-top: 2rem;">🌟 ¡Tu potencial es infinito, como los conjuntos
+                        numéricos! 🌟</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 14</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function revealSolution(btn) {
+            btn.style.display = 'none';
+            btn.nextElementSibling.style.display = 'block';
+        }
+
+        function showPairs(id) {
+            const result = document.getElementById('pairs-result');
+            const arrows = (id === 1) ? ['arrow-1-a', 'arrow-1-b'] : ['arrow-2-a', 'arrow-2-b'];
+            const labels = (id === 1) ? ['(1, x)', '(1, y)'] : ['(2, x)', '(2, y)'];
+            const activeBox = document.getElementById(`item-a${id}`);
+
+            // Estilo visual del botón
+            activeBox.style.background = 'var(--primary-orange)';
+            activeBox.style.color = 'white';
+
+            arrows.forEach((arrId, index) => {
+                const arrow = document.getElementById(arrId);
+                arrow.style.opacity = '1';
+
+                // Crear etiqueta de pareja si no existe
+                if (!result.innerHTML.includes(labels[index])) {
+                    const span = document.createElement('span');
+                    span.className = 'cartesian-pair';
+                    span.innerText = labels[index];
+                    result.appendChild(span);
+                }
+            });
+        }
+
+        function checkQuiz(qId, isCorrect, btn, message, optionText) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const redColor = "#993921";
+            if (isCorrect) {
+                btn.style.background = "#d1fae5";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = "🌟 " + message;
+                feedback.style.color = "#059669";
+                const btns = btn.parentElement.querySelectorAll('.option-btn');
+                btns.forEach(b => { if (b !== btn) b.style.opacity = "0.5"; b.disabled = true; });
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = redColor;
+                feedback.innerHTML = "❌ " + message;
+                feedback.style.color = redColor;
+                btn.disabled = true;
+            }
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

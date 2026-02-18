@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 10: Jerarquía de Operaciones - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-red: #993921;
+            --bg-light: #f4f7f9;
+            --white: #ffffff;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 600px;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-light);
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.8rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.3rem;
+            color: #444;
+            max-width: 780px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.2rem;
+            border-radius: 15px;
+            background: var(--white);
+            margin: 0.8rem 0;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-yellow);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 70px;
+            height: 70px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 250;
+            border: 2px solid #eee;
+            color: var(--primary-blue-dark);
+            font-size: 2rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.15);
+            background-color: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 15px;
+        }
+
+        #next-btn {
+            right: 15px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-blue-dark);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary-yellow), var(--primary-orange));
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: var(--white);
+            cursor: pointer;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--primary-blue-dark);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .emoji-box {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+        }
+
+        .nice-phrase {
+            font-style: italic;
+            color: var(--primary-orange);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .step-display {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue-dark);
+            margin: 1rem 0;
+            min-height: 2.5rem;
+            transition: all 0.3s;
+        }
+
+        .step-label {
+            font-size: 1.1rem;
+            color: var(--primary-orange);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pemdas-badge {
+            display: inline-block;
+            width: 45px;
+            height: 45px;
+            line-height: 45px;
+            border-radius: 50%;
+            background: var(--primary-blue-dark);
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin: 0 5px;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 30px 40px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            .nav-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Escolaris - Matemática 6&deg; Primaria</span>
+            <span>Lección 10: Jerarquía de Operaciones</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div class="emoji-box">🪜🧮</div>
+                    <h1>El Orden del Poder</h1>
+                    <h2 style="color: var(--primary-orange);">Jerarquía de Operaciones</h2>
+                    <p class="nice-phrase">✨ ¡Tu lógica es la brújula del conocimiento! ✨</p>
+                </div>
+
+                <!-- Slide 2: El Dilema -->
+                <div class="slide">
+                    <div class="emoji-box">🤔</div>
+                    <h2>¿Quién gana la batalla?</h2>
+                    <p>Mira esta operación: <strong>2 + 3 × 5</strong></p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem; width: 100%; justify-content: center;">
+                        <div class="info-card" style="border-left-color: var(--primary-red); opacity: 0.6;">
+                            <p>❌ <strong>Camino A:</strong> 2+3=5, luego 5×5= <strong>25</strong></p>
+                        </div>
+                        <div class="info-card" style="border-left-color: #10b981;">
+                            <p>✅ <strong>Camino B:</strong> 3×5=15, luego 2+15= <strong>17</strong></p>
+                        </div>
+                    </div>
+                    <p class="nice-phrase">¡En matemáticas, el orden importa muchísimo! 🧐</p>
+                </div>
+
+                <!-- Slide 3: Misión -->
+                <div class="slide">
+                    <div class="emoji-box">🎯</div>
+                    <h2>Nuestra Misión</h2>
+                    <div class="info-card">
+                        <ul style="list-style: none; text-align: left; font-size: 1.2rem;">
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Aprender</strong> quién va primero en una
+                                operación.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Resolver</strong> problemas combinados paso a
+                                paso.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Estimar</strong> resultados para no
+                                equivocarnos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Slide 4: PEMDAS -->
+                <div class="slide">
+                    <div class="emoji-box">🥇</div>
+                    <h2>El Código PEMDAS</h2>
+                    <p>Es el secreto para resolver cualquier laberinto numérico:</p>
+                    <div style="margin: 1.5rem 0;">
+                        <span class="pemdas-badge">P</span> <span style="font-weight: 700;">Paréntesis</span><br>
+                        <span class="pemdas-badge" style="background: var(--primary-orange);">E</span> <span
+                            style="font-weight: 700;">Exponentes</span><br>
+                        <span class="pemdas-badge"
+                            style="background: var(--primary-yellow); color: var(--primary-blue-dark);">M</span> <span
+                            style="font-weight: 700;">Multiplicación y División</span><br>
+                        <span class="pemdas-badge" style="background: #10b981;">AS</span> <span
+                            style="font-weight: 700;">Adición y Sustracción</span>
+                    </div>
+                    <p class="nice-phrase">¡Memoriza este orden y serás invencible! 🏆</p>
+                </div>
+
+                <!-- Slide 5: Paréntesis -->
+                <div class="slide">
+                    <div class="emoji-box">📦</div>
+                    <h2>Los Invitados Especiales</h2>
+                    <p>Los <strong>paréntesis ( )</strong> siempre van primero. Son como una burbuja que protege su
+                        operación.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-blue-dark);">
+                        <p style="font-size: 1.5rem;">4 × <strong>(2 + 3)</strong> = 4 × <strong>5</strong> = 20</p>
+                    </div>
+                    <p>¡Incluso si hay una suma adentro, ella gana por estar protegida!</p>
+                </div>
+
+                <!-- Slide 6: Multi y Div -->
+                <div class="slide">
+                    <div class="emoji-box">⚖️</div>
+                    <h2>Lazos de Poder</h2>
+                    <p>La Multiplicación (×) y División (÷) tienen el mismo nivel. Se resuelven de <strong>izquierda a
+                            derecha</strong>.</p>
+                    <div class="info-card">
+                        <p style="font-size: 1.4rem;">10 ÷ 2 × 5 = <br> <strong>5 × 5 = 25</strong></p>
+                    </div>
+                </div>
+
+                <!-- Slide 7: El Simulador -->
+                <div class="slide">
+                    <div class="emoji-box">🧪</div>
+                    <h2>Simulador Paso a Paso</h2>
+                    <p>Haz clic en el botón para resolver: <br> <strong>10 + (2 × 5) - 4</strong></p>
+
+                    <div id="sim-content">
+                        <div class="step-label" id="step-desc">Operación original</div>
+                        <div class="step-display" id="step-math">10 + (2 × 5) - 4</div>
+                        <button onclick="nextStep()" id="sim-btn"
+                            style="background: var(--primary-orange); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 25px; cursor: pointer; font-weight: 700;">Resolver
+                            Siguiente Paso ⏩</button>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Estimaciones -->
+                <div class="slide">
+                    <div class="emoji-box">🔮</div>
+                    <h2>Poder de Estimación</h2>
+                    <p>Antes de resolver, intenta "adivinar" el resultado aproximando los números.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-yellow);">
+                        <p>21 × 4.9 ≈ <strong>20 × 5 = 100</strong></p>
+                        <p>Si tu resultado da 500, ¡sabes que algo anda mal! 🔍</p>
+                    </div>
+                </div>
+
+                <!-- Slide 9: Reto Veloz 1 -->
+                <div class="slide">
+                    <div class="emoji-box">🧠</div>
+                    <h2>¡Reto Veloz!</h2>
+                    <p>¿Qué se resuelve primero en: <br> <strong>12 ÷ (2 + 4) × 3</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, true, this, '¡Exacto! Los paréntesis son la máxima autoridad.', '(2 + 4)')">A)
+                            Los Paréntesis (2+4)</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, 'No, la división debe esperar a que los paréntesis terminen.', '12 ÷ 2')">B)
+                            La División 12 ÷ 2</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(1, false, this, '¡Jamás! La multiplicación está al final comparada con los paréntesis.', '4 × 3')">C)
+                            La Multiplicación 4 × 3</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 10: Reto de Cálculo -->
+                <div class="slide">
+                    <div class="emoji-box">⚡</div>
+                    <h2>¡Calculadora Humana!</h2>
+                    <p>¿Cuál es el resultado de: <strong>20 - 5 × 2</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, false, this, '¡Cuidado! Restaste antes de multiplicar.', '30')">30</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, true, this, '¡Brillante! 5×2=10, luego 20-10=10.', '10')">10</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(2, false, this, '¡Piénsalo de nuevo!', '5')">5</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 11: Reto de Estimación -->
+                <div class="slide">
+                    <div class="emoji-box">🏹</div>
+                    <h2>Tiro al Blanco</h2>
+                    <p>Estima el resultado de <strong>49 × 51</strong>:</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(3, false, this, 'Está muy lejos de la realidad.', '500')">~500</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(3, true, this, '¡Perfecto! 50 × 50 es igual a 2,500.', '~2,500')">~2,500</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(3, false, this, 'Te pasaste por mucho.', '5,000')">~5,000</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 700; font-size: 1.2rem;"></div>
+                </div>
+
+                <!-- Slide 12: Reflexión -->
+                <div class="slide">
+                    <div class="emoji-box">💡</div>
+                    <h2>Pensamiento Crítico</h2>
+                    <div class="info-card" style="text-align: left;">
+                        <p>🥞 ¿Qué pasaría si cocinaras sin seguir un orden? (¡Harina antes que huevos!)</p>
+                        <p>🔢 ¿Por qué crees que el mundo se puso de acuerdo en estas reglas?</p>
+                        <p>🚀 ¡Imagina programar un robot! ¿Qué orden le darías para que no falle?</p>
+                    </div>
+                </div>
+
+                <!-- Slide 13: Frase Maestra -->
+                <div class="slide">
+                    <div class="emoji-box">✨</div>
+                    <h2>El Secreto del Éxito</h2>
+                    <p>"El éxito no es solo llegar a la respuesta, sino disfrutar del orden y la lógica del camino."</p>
+                    <div class="info-card">
+                        <p>🌟 <strong>¡Has completado el ciclo de guías interactivas!</strong> 🌟</p>
+                    </div>
+                    <p class="nice-phrase">🌈 ¡Tu potencial es infinito, campeón! 🌈</p>
+                </div>
+
+                <!-- Slide 14: Cierre Final -->
+                <div class="slide">
+                    <div class="emoji-box">🏆</div>
+                    <h2>¡Misión 100% Completada!</h2>
+                    <p>Has dominado el arte de la jerarquía matemática. ¡Eres un genio del cálculo!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1.2rem 2.5rem; border-radius: 40px; font-weight: 700; cursor: pointer; margin-top: 2rem; font-size: 1.2rem; box-shadow: 0 5px 15px rgba(219, 96, 21, 0.3);">Volver
+                        a Empezar 🔄</button>
+                    <p class="nice-phrase" style="margin-top: 2rem;">🌟 ¡El futuro de las matemáticas te pertenece! 🌟
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 14</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function checkQuiz(qId, isCorrect, btn, message, optionText) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const redColor = "#993921";
+            if (isCorrect) {
+                btn.style.background = "#d1fae5";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = "🌟 " + message;
+                feedback.style.color = "#059669";
+                const btns = btn.parentElement.querySelectorAll('.option-btn');
+                btns.forEach(b => { if (b !== btn) b.style.opacity = "0.5"; b.disabled = true; });
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = redColor;
+                feedback.innerHTML = "❌ " + message;
+                feedback.style.color = redColor;
+                btn.disabled = true;
+            }
+        }
+
+        // Simulador de Pasos
+        let currentSimStep = 0;
+        const simLines = [
+            { text: "10 + (2 × 5) - 4", desc: "Operación original" },
+            { text: "10 + 10 - 4", desc: "¡Primero los paréntesis! (2×5=10)" },
+            { text: "20 - 4", desc: "Sumamos de izquierda a derecha (10+10=20)" },
+            { text: "16", desc: "¡Resultado final! ✨" }
+        ];
+
+        function nextStep() {
+            currentSimStep++;
+            if (currentSimStep >= simLines.length) {
+                currentSimStep = 0;
+                document.getElementById('sim-btn').innerText = "Volver a practicar 🔄";
+            } else {
+                document.getElementById('sim-btn').innerText = "Siguiente Paso ⏩";
+            }
+
+            const mathEl = document.getElementById('step-math');
+            const descEl = document.getElementById('step-desc');
+
+            mathEl.style.opacity = '0';
+            setTimeout(() => {
+                mathEl.innerText = simLines[currentSimStep].text;
+                descEl.innerText = simLines[currentSimStep].desc;
+                mathEl.style.opacity = '1';
+                if (currentSimStep === simLines.length - 1) {
+                    mathEl.style.color = 'var(--primary-orange)';
+                    mathEl.style.fontSize = '3rem';
+                } else {
+                    mathEl.style.color = 'var(--primary-blue-dark)';
+                    mathEl.style.fontSize = '2rem';
+                }
+            }, 300);
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>
