@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 13.1: Suma y Resta de Fracciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #993921;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.22rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #444;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .op-card {
+            background: white;
+            border: 2px solid var(--primary-blue-dark);
+            border-radius: 10px;
+            padding: 15px;
+            width: 320px;
+            text-align: left;
+        }
+
+        .op-card h3 {
+            color: var(--primary-blue-dark);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .fraction .num {
+            padding: 0 5px;
+        }
+        
+        .fraction .den {
+            border-top: 2px solid #1e293b;
+            padding: 0 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+        }
+
+        .butterfly-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fdf4ff;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 13.1: Suma y Resta de Fracciones</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Portada 1 -->
+                <div class="slide active">
+                    <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🍕➕🍰</div>
+                    <h1 style="font-size: 2.2rem;">Suma y Resta de Fracciones</h1>
+                    <h2 style="font-weight: 600;">Lección 13.1 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic;">¡Aprende a sumar y restar partes iguales y partes diferentes!</p>
+                </div>
+
+                <!-- 2. Repaso -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 0.5rem;">Repaso: Partes de una Fracción</h2>
+                    <p>Antes de operar, recordemos cómo se compone una fracción.</p>
+                    
+                    <div class="info-card" style="display: flex; flex-direction: column; align-items: center;">
+                        <div class="fraction" style="font-size: 3rem; margin-bottom: 20px;">
+                            <span class="num" style="color: var(--primary-orange);">3</span>
+                            <span class="den" style="color: var(--primary-blue-dark);">4</span>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: center; gap: 40px; text-align: left; background: white; padding: 20px; border-radius: 10px;">
+                            <div>
+                                <h3 style="color: var(--primary-orange);">Numerador (arriba)</h3>
+                                <p style="font-size: 0.95rem;">Indica cuántas partes <strong>tomamos</strong> o tenemos.</p>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--primary-blue-dark);">Denominador (abajo)</h3>
+                                <p style="font-size: 0.95rem;">Indica en cuántas partes iguales se <strong>divide</strong> el total.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Fracciones Homogeneas -->
+                <div class="slide">
+                    <h2>Fracciones Homogéneas</h2>
+                    <p>Son las fracciones que tienen <strong>el mismo denominador</strong>. ¡Son muy fáciles de sumar y restar!</p>
+                    
+                    <div class="op-card" style="width: 100%; max-width: 700px; text-align: center; border-color: var(--primary-green); margin-top: 20px;">
+                        <h3 style="color: var(--primary-green);">Regla de las Homogéneas</h3>
+                        <p style="margin-bottom: 15px;">Sumamos o restamos los numeradores (arriba) y el denominador (abajo) <strong>SE QUEDA IGUAL</strong>.</p>
+                        
+                        <div class="math-row" style="background: #f0fdf4; padding: 15px; border-radius: 8px;">
+                            <div class="fraction">
+                                <span class="num">2</span><span class="den">5</span>
+                            </div>
+                            <span style="margin: 0 15px; color: var(--primary-green);">+</span>
+                            <div class="fraction">
+                                <span class="num">1</span><span class="den">5</span>
+                            </div>
+                            <span style="margin: 0 15px;">=</span>
+                            <div class="fraction" style="color: var(--primary-green);">
+                                <span class="num">3</span><span class="den">5</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #555; margin-top: 10px;">(Sumamos 2 + 1 = 3. El 5 se copia).</p>
+                    </div>
+                </div>
+
+                <!-- 4. Fracciones Heterogeneas -->
+                <div class="slide">
+                    <h2>Fracciones Heterogéneas</h2>
+                    <p>Tienen <strong>diferente denominador</strong>. ¡No se pueden sumar o restar directamente!</p>
+                    
+                    <div class="info-card" style="background: #fff7ed;">
+                        <p style="color: var(--primary-red); font-weight: bold; margin-bottom: 15px;">⚠️ ¡CUIDADO! NUNCA SUMES LOS DENOMINADORES.</p>
+                        
+                        <div class="math-row" style="opacity: 0.5;">
+                            <div class="fraction"><span class="num">1</span><span class="den">2</span></div>
+                            <span style="margin: 0 15px;">+</span>
+                            <div class="fraction"><span class="num">1</span><span class="den">3</span></div>
+                            <span style="margin: 0 15px; color: red;">&ne;</span>
+                            <div class="fraction"><span class="num">2</span><span class="den">5</span></div>
+                            <span style="color: red; font-size: 1.5rem; margin-left: 10px;">❌ ¡MAL!</span>
+                        </div>
+                        
+                        <p style="margin-top: 20px;">Primero debemos encontrar un <strong>denominador común</strong> (hacer que las rebanadas sean del mismo tamaño).</p>
+                    </div>
+                </div>
+
+                <!-- 5. Método Mariposa -->
+                <div class="slide">
+                    <h2>Método de la Mariposa 🦋</h2>
+                    <p>Ideal para sumar o restar <strong>dos</strong> fracciones heterogéneas rápidamente usando productos cruzados.</p>
+                    
+                    <div class="butterfly-container">
+                        <div class="math-row">
+                            <div class="fraction"><span class="num" style="color: var(--primary-orange);">1</span><span class="den" style="color: var(--primary-green);">2</span></div>
+                            <span style="margin: 0 15px;">+</span>
+                            <div class="fraction"><span class="num" style="color: var(--primary-purple);">1</span><span class="den" style="color: var(--primary-blue-dark);">3</span></div>
+                            <span style="margin: 0 15px;">=</span>
+                            
+                            <!-- Resultado -->
+                            <div class="fraction">
+                                <span class="num" style="border: none;">(<span style="color:var(--primary-orange)">1</span>&times;<span style="color:var(--primary-blue-dark)">3</span>) + (<span style="color:var(--primary-green)">2</span>&times;<span style="color:var(--primary-purple)">1</span>)</span>
+                                <span class="den"><span style="color:var(--primary-green)">2</span> &times; <span style="color:var(--primary-blue-dark)">3</span></span>
+                            </div>
+                            <span style="margin: 0 15px;">=</span>
+                            <div class="fraction">
+                                <span class="num">3 + 2</span>
+                                <span class="den">6</span>
+                            </div>
+                            <span style="margin: 0 15px;">=</span>
+                            <div class="fraction">
+                                <span class="num" style="color: var(--primary-orange);">5</span>
+                                <span class="den" style="color: var(--primary-orange);">6</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.9rem;">1. Multiplica denominadores (2&times;3=6). 2. Multiplica cruzado (1&times;3=3 y 2&times;1=2). 3. Suma arriba.</p>
+                </div>
+
+                <!-- 6. Método MCM -->
+                <div class="slide">
+                    <h2>Método del M.C.M.</h2>
+                    <p>Si tienes denominadores grandes o más de dos fracciones, el <strong>Mínimo Común Múltiplo</strong> es tu mejor amigo.</p>
+                    
+                    <div class="info-card" style="text-align: left; margin: 0 auto; width: 90%;">
+                        <div class="math-row" style="font-size: 1.5rem; justify-content: flex-start; margin-bottom: 10px;">
+                            <span style="font-size: 1.2rem; color: #333; font-weight: normal; margin-right: 15px;">Ejemplo:</span>
+                            <div class="fraction"><span class="num">5</span><span class="den">6</span></div>
+                            <span style="margin: 0 10px;">-</span>
+                            <div class="fraction"><span class="num">1</span><span class="den">4</span></div>
+                        </div>
+                        <ol style="margin-left: 20px; line-height: 1.8;">
+                            <li>Encontramos el MCM de los denominadores (6 y 4). El MCM es <strong>12</strong>.</li>
+                            <li>Ese 12 será nuestro <strong>nuevo denominador</strong>.</li>
+                            <li>Para el numerador: Dividimos el MCM (12) entre el denominador original y multiplicamos por el numerador.
+                                <ul style="list-style-type: disc; margin-left: 20px; color: #555;">
+                                    <li>Primera fracción: (12 &divide; 6) &times; 5 = 2 &times; 5 = <strong>10</strong></li>
+                                    <li>Segunda fracción: (12 &divide; 4) &times; 1 = 3 &times; 1 = <strong>3</strong></li>
+                                </ul>
+                            </li>
+                            <li>Restamos: <div class="fraction" style="font-size: 1.2rem;"><span class="num">10 - 3</span><span class="den">12</span></div> = <strong style="color: var(--primary-blue-dark);">7/12</strong></li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- 7. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Homogéneas</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        <div class="fraction"><span class="num">3</span><span class="den">8</span></div> + <div class="fraction"><span class="num">4</span><span class="den">8</span></div> = ?
+                    </div>
+                    <p>¿Cuál es el resultado de la suma anterior?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', '¡Cuidado! No debes sumar los denominadores. El denominador se copia igual.')">A) 7/16</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Sumamos 3+4=7 y copiamos el 8.', '')">B) 7/8</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Parece que multiplicaste algo. Recuerda, solo suma los numeradores.')">C) 12/8</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: Conceptos</h2>
+                    <p>¿Qué debes hacer PRIMERO antes de sumar o restar dos fracciones con <strong>diferente denominador</strong> (heterogéneas)?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', '¡No! Si las sumas directamente el resultado será incorrecto.')">A) Sumarlas directamente de frente.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Necesitamos encontrar un denominador común usando el método mariposa o el MCM.', '')">B) Encontrar un denominador común.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Solo sumar los numeradores y olvidar los denominadores está mal matemáticamente.')">C) Sumar solo los numeradores y eliminar el denominador.</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: ¡A calcular!</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        <div class="fraction"><span class="num">2</span><span class="den">3</span></div> - <div class="fraction"><span class="num">1</span><span class="den">4</span></div> = ?
+                    </div>
+                    <p>Resuelve la resta usando el método mariposa o MCM.</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', '¡Cuidado! Restaste directo: 2-1=1 y 4-3=1. ¡Eso no se puede hacer!')">A) 1/1</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'El denominador común (3x4) es 12. Pero los numeradores cruzados son 8 y 3. ¡Intenta restarlos bien!')">B) 11/12</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Perfecto! (2x4) - (1x3) = 8 - 3 = 5. Y abajo 3x4 = 12. Resultado: 5/12.', '')">C) 5/12</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">💯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>Ahora eres un experto sumando y restando pedazos de pizza... ¡Digo, fracciones!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem;">Volver a repasar</button>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

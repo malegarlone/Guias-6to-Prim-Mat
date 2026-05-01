@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 13.2: Multiplicación y División de Fracciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #993921;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.22rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #444;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .op-card {
+            background: white;
+            border: 2px solid var(--primary-blue-dark);
+            border-radius: 10px;
+            padding: 15px;
+            width: 320px;
+            text-align: left;
+        }
+
+        .op-card h3 {
+            color: var(--primary-blue-dark);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .fraction .num {
+            padding: 0 5px;
+        }
+        
+        .fraction .den {
+            border-top: 2px solid #1e293b;
+            padding: 0 5px;
+        }
+
+        .math-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+        }
+
+        .arrow-right {
+            color: var(--primary-orange);
+            font-size: 1.5rem;
+            margin: 0 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 13.2: Multiplicación y División de Fracciones</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Portada 1 -->
+                <div class="slide active">
+                    <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">✖️➗🍕</div>
+                    <h1 style="font-size: 2.2rem;">Multiplicación y División de Fracciones</h1>
+                    <h2 style="font-weight: 600;">Lección 13.2 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic;">¡Descubre que multiplicar y dividir fracciones es más fácil de lo que parece!</p>
+                </div>
+
+                <!-- 2. Multiplicacion Intro -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 0.5rem;">Multiplicación de Fracciones</h2>
+                    <p>¡Buenas noticias! Esta es la operación más fácil con fracciones. No necesitas buscar denominadores comunes.</p>
+                    
+                    <div class="info-card" style="border: 2px solid var(--primary-green); background: #f0fdf4;">
+                        <h3 style="color: var(--primary-green); font-size: 1.5rem; margin-bottom: 10px;">La Regla de Oro ✨</h3>
+                        <p style="font-size: 1.2rem; margin-bottom: 5px;">Se multiplica <strong>DIRECTO</strong>.</p>
+                        <p style="color: #555;">Numerador por numerador (los de arriba con los de arriba) y denominador por denominador (los de abajo con los de abajo).</p>
+                    </div>
+                </div>
+
+                <!-- 3. Ejemplo Multiplicacion -->
+                <div class="slide">
+                    <h2>Ejemplo de Multiplicación</h2>
+                    
+                    <div class="op-card" style="width: 100%; max-width: 600px; text-align: center; border-color: var(--primary-orange); margin-top: 20px;">
+                        
+                        <div class="math-row" style="background: #fff7ed; padding: 20px; border-radius: 8px;">
+                            <div class="fraction">
+                                <span class="num">2</span><span class="den">3</span>
+                            </div>
+                            <span style="margin: 0 15px; color: var(--primary-orange);">&times;</span>
+                            <div class="fraction">
+                                <span class="num">4</span><span class="den">5</span>
+                            </div>
+                            <span style="margin: 0 15px;">=</span>
+                            
+                            <div class="fraction">
+                                <span class="num" style="border: none; color: var(--primary-blue-dark);">2 &times; 4</span>
+                                <span class="den" style="color: var(--primary-blue-dark);">3 &times; 5</span>
+                            </div>
+                            
+                            <span style="margin: 0 15px;">=</span>
+                            <div class="fraction" style="color: var(--primary-orange);">
+                                <span class="num">8</span><span class="den">15</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 1rem; color: #555; margin-top: 15px;">Multiplicamos 2&times;4 = 8, y luego 3&times;5 = 15. ¡Eso es todo!</p>
+                    </div>
+                </div>
+
+                <!-- 4. Division Intro -->
+                <div class="slide">
+                    <h2>División de Fracciones</h2>
+                    <p>Dividir fracciones parece difícil, pero en realidad es un truco de magia: <strong>¡se convierte en una multiplicación!</strong></p>
+                    
+                    <div class="flex-container">
+                        <div class="op-card" style="border-color: #3b82f6;">
+                            <h3 style="color: #3b82f6;">Método 1: Producto Cruzado</h3>
+                            <p style="font-size: 0.95rem;">Multiplicamos en forma de "zig-zag" o "dulce". El de arriba por el de abajo sube, el de abajo por el de arriba baja.</p>
+                        </div>
+                        <div class="op-card" style="border-color: var(--primary-purple);">
+                            <h3 style="color: var(--primary-purple);">Método 2: Fracción Inversa</h3>
+                            <p style="font-size: 0.95rem;">Cambiamos el signo de división por multiplicación, y le damos la vuelta ("invertimos") a la SEGUNDA fracción.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Método Cruzado -->
+                <div class="slide">
+                    <h2>Método 1: Producto Cruzado (Zig-Zag)</h2>
+                    
+                    <div class="info-card" style="background: #eff6ff;">
+                        <div class="math-row" style="margin-bottom: 20px;">
+                            <div class="fraction"><span class="num" style="color: var(--primary-orange);">2</span><span class="den" style="color: var(--primary-green);">3</span></div>
+                            <span style="margin: 0 15px; color: #3b82f6;">&divide;</span>
+                            <div class="fraction"><span class="num" style="color: var(--primary-purple);">4</span><span class="den" style="color: var(--primary-red);">5</span></div>
+                            <span style="margin: 0 15px;">=</span>
+                            
+                            <div class="fraction">
+                                <span class="num" style="border: none;">(<span style="color:var(--primary-orange)">2</span> &times; <span style="color:var(--primary-red)">5</span>)</span>
+                                <span class="den">(<span style="color:var(--primary-green)">3</span> &times; <span style="color:var(--primary-purple)">4</span>)</span>
+                            </div>
+                            <span style="margin: 0 15px;">=</span>
+                            <div class="fraction">
+                                <span class="num" style="color: #3b82f6;">10</span>
+                                <span class="den" style="color: #3b82f6;">12</span>
+                            </div>
+                        </div>
+                        <p style="text-align: left; font-size: 1rem; margin-left: 40px;">
+                            ↗️ Numerador 1 &times; Denominador 2 = <strong>Nuevo Numerador</strong> (2&times;5=10)<br>
+                            ↘️ Denominador 1 &times; Numerador 2 = <strong>Nuevo Denominador</strong> (3&times;4=12)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 6. Método Inverso -->
+                <div class="slide">
+                    <h2>Método 2: Invertir y Multiplicar</h2>
+                    <p>Este método es el favorito de muchos porque lo convierte en una operación que ya conoces.</p>
+                    
+                    <div class="info-card" style="background: #f5f3ff;">
+                        <div class="math-row" style="margin-bottom: 10px;">
+                            <div class="fraction"><span class="num">2</span><span class="den">3</span></div>
+                            <span style="margin: 0 10px; color: red; text-decoration: line-through;">&divide;</span>
+                            <div class="fraction" style="border: 2px dashed #9333ea; padding: 5px; border-radius: 5px;"><span class="num">4</span><span class="den">5</span></div>
+                        </div>
+                        
+                        <div style="font-size: 2rem; margin: 10px 0;">⬇️</div>
+                        
+                        <div class="math-row">
+                            <div class="fraction"><span class="num">2</span><span class="den">3</span></div>
+                            <span style="margin: 0 10px; color: var(--primary-green); font-size: 2.5rem;">&times;</span>
+                            <div class="fraction" style="background: #e9d5ff; padding: 5px; border-radius: 5px;"><span class="num">5</span><span class="den">4</span></div>
+                            <span style="margin: 0 10px;">=</span>
+                            <div class="fraction" style="color: var(--primary-purple);"><span class="num">10</span><span class="den">12</span></div>
+                        </div>
+                        
+                        <p style="margin-top: 15px; font-weight: bold; color: var(--primary-purple);">¡El 4/5 se "volteó" a 5/4 y dividimos multiplicando de frente!</p>
+                    </div>
+                </div>
+
+                <!-- 7. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Multiplicación</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        <div class="fraction"><span class="num">1</span><span class="den">4</span></div> &times; <div class="fraction"><span class="num">3</span><span class="den">5</span></div> = ?
+                    </div>
+                    <p>¿Cuál es el resultado de la multiplicación anterior?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! (1&times;3=3) y (4&times;5=20).', '')">A) 3/20</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Parece que multiplicaste cruzado. ¡Recuerda que en la multiplicación es DIRECTO!')">B) 5/12</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Solo sumaste los números en lugar de multiplicarlos.')">C) 4/9</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: División</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        <div class="fraction"><span class="num">5</span><span class="den">7</span></div> &divide; <div class="fraction"><span class="num">2</span><span class="den">3</span></div> = ?
+                    </div>
+                    <p>Resuelve la división. (Pista: invierte la segunda fracción y multiplica de frente).</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Multiplicaste directo sin invertir la segunda fracción o cruzar los productos.')">A) 10/21</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Invertiste la fracción equivocada.')">B) 14/15</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Queda 5/7 &times; 3/2 = 15/14. ¡O usando el zig-zag: (5x3)/(7x2) = 15/14!', '')">C) 15/14</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: El secreto de la división</h2>
+                    <p>Si quieres dividir dos fracciones usando el <strong>Método de la Fracción Inversa</strong>, ¿Qué es lo que debes invertir (voltear)?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Si inviertes la primera, el resultado será incorrecto.')">A) La primera fracción.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Muy bien! Volteas la segunda fracción y cambias el signo de división a multiplicación.', '')">B) La segunda fracción.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Solo se invierte una de las dos fracciones, no ambas.')">C) Ambas fracciones.</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🚀</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>Dominaste la multiplicación y descubriste que dividir es solo multiplicar al revés.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem;">Volver a repasar</button>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 12: Factores y Números Primos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #993921;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.22rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #444;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .op-card {
+            background: white;
+            border: 2px solid var(--primary-blue-dark);
+            border-radius: 10px;
+            padding: 15px;
+            width: 280px;
+            text-align: left;
+        }
+
+        .op-card h3 {
+            color: var(--primary-blue-dark);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 5px solid var(--primary-yellow);
+            padding: 15px;
+            text-align: left;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .factor-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .tree-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .tree-node {
+            background: white;
+            border: 2px solid var(--primary-blue-dark);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 2;
+        }
+        
+        .tree-node.prime {
+            background: #dcfce7;
+            border-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .line-left, .line-right {
+            position: absolute;
+            top: -25px;
+            width: 2px;
+            height: 35px;
+            background: var(--primary-blue-dark);
+            z-index: 1;
+        }
+        
+        .line-left { left: 50%; transform: translateX(-20px) rotate(30deg); }
+        .line-right { left: 50%; transform: translateX(20px) rotate(-30deg); }
+
+        .prime-list {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .prime-chip {
+            background: var(--primary-green);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .composite-chip {
+            background: var(--primary-orange);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 12: Factores, Divisibilidad y Primos</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Portada 1 -->
+                <div class="slide active">
+                    <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🕵️‍♀️🔢</div>
+                    <h1 style="font-size: 2.2rem;">Divisibilidad y Números Primos</h1>
+                    <h2 style="font-weight: 600;">Lección 12 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic;">¡Aprende a descomponer los números en sus piezas de construcción más pequeñas!</p>
+                </div>
+
+                <!-- 2. Factores -->
+                <div class="slide">
+                    <h2>¿Qué es un Factor?</h2>
+                    <p>Un <strong>factor</strong> o <strong>divisor</strong> es un número que divide exactamente a otro número, sin dejar ningún residuo.</p>
+                    
+                    <div class="info-card">
+                        <p style="font-size: 1.2rem; font-weight: 600; color: var(--primary-blue-dark);">Ejemplo: Factores del 12</p>
+                        <p>Busquemos las multiplicaciones que dan como resultado 12:</p>
+                        <div style="display: flex; justify-content: center; gap: 30px; margin: 15px 0;">
+                            <div style="background: white; padding: 10px 20px; border-radius: 8px; border: 1px dashed #ccc;">
+                                1 &times; 12 = 12
+                            </div>
+                            <div style="background: white; padding: 10px 20px; border-radius: 8px; border: 1px dashed #ccc;">
+                                2 &times; 6 = 12
+                            </div>
+                            <div style="background: white; padding: 10px 20px; border-radius: 8px; border: 1px dashed #ccc;">
+                                3 &times; 4 = 12
+                            </div>
+                        </div>
+                        <p style="margin-top: 10px;">Los factores de 12 son: <strong style="color: var(--primary-orange); font-size: 1.3rem;">1, 2, 3, 4, 6 y 12</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- 3. Divisibilidad -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 0.5rem;">Reglas de Divisibilidad</h2>
+                    <p>Nos ayudan a saber si un número es factor de otro rápidamente.</p>
+                    
+                    <div class="flex-container">
+                        <div class="op-card" style="border-color: #3b82f6;">
+                            <h3 style="color: #3b82f6;">Divisible por 2</h3>
+                            <p>Si termina en número par o cero: <strong>0, 2, 4, 6 u 8</strong>.</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">Ej: 14, 2<strong>8</strong>, 15<strong>0</strong> ✅</p>
+                        </div>
+                        <div class="op-card" style="border-color: var(--primary-orange);">
+                            <h3 style="color: var(--primary-orange);">Divisible por 3</h3>
+                            <p>Si la <strong>suma de sus cifras</strong> es un múltiplo de 3.</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">Ej: 45 (4+5=9). 9 es múltiplo de 3 ✅</p>
+                        </div>
+                        <div class="op-card" style="border-color: var(--primary-green);">
+                            <h3 style="color: var(--primary-green);">Divisible por 5</h3>
+                            <p>Si el número termina únicamente en <strong>0 o 5</strong>.</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">Ej: 3<strong>5</strong>, 12<strong>0</strong> ✅</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Números Primos y Compuestos -->
+                <div class="slide">
+                    <h2>¿Qué es un Número Primo?</h2>
+                    <p>Los números se dividen en dos familias según cuántos factores tienen.</p>
+                    
+                    <div class="flex-container" style="gap: 40px; margin-top: 20px;">
+                        <div style="width: 350px;">
+                            <h3 style="color: var(--primary-green); margin-bottom: 10px;">🛡️ Números Primos</h3>
+                            <p style="font-size: 0.95rem;">Son aquellos que <strong>solo tienen 2 factores</strong>: el número 1 y ellos mismos.</p>
+                            <div class="prime-list">
+                                <span class="prime-chip">2</span>
+                                <span class="prime-chip">3</span>
+                                <span class="prime-chip">5</span>
+                                <span class="prime-chip">7</span>
+                                <span class="prime-chip">11</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: #666; margin-top: 10px;">Ej: El 5 solo puede dividirse entre 1 y 5.</p>
+                        </div>
+                        
+                        <div style="width: 350px;">
+                            <h3 style="color: var(--primary-orange); margin-bottom: 10px;">🧱 Números Compuestos</h3>
+                            <p style="font-size: 0.95rem;">Son aquellos que tienen <strong>más de 2 factores</strong>.</p>
+                            <div class="prime-list">
+                                <span class="composite-chip">4</span>
+                                <span class="composite-chip">6</span>
+                                <span class="composite-chip">8</span>
+                                <span class="composite-chip">9</span>
+                                <span class="composite-chip">10</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: #666; margin-top: 10px;">Ej: El 4 puede dividirse entre 1, 2 y 4.</p>
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="width: 100%; max-width: 740px; margin-top: 20px;">
+                        <p style="text-align: center; margin: 0;"><strong>¡OJO!</strong> El número <strong>1</strong> no es primo ni compuesto, porque solo tiene un factor (él mismo).</p>
+                    </div>
+                </div>
+
+                <!-- 5. Factorización Prima -->
+                <div class="slide">
+                    <h2>¿Qué es la Factorización Prima?</h2>
+                    <p>Es como un juego de construcción: consiste en expresar cualquier número compuesto como una multiplicación de <strong>solamente números primos</strong>.</p>
+                    
+                    <div class="info-card">
+                        <p style="margin-bottom: 15px;">Imagina que los números primos (2, 3, 5, 7...) son los bloques Lego básicos.</p>
+                        <p>Si queremos construir el número <strong>12</strong> con bloques primos:</p>
+                        
+                        <div style="font-size: 2rem; color: var(--primary-blue-dark); font-weight: bold; margin: 15px 0;">
+                            12 = <span style="color: var(--primary-green);">2</span> &times; <span style="color: var(--primary-green);">2</span> &times; <span style="color: var(--primary-green);">3</span>
+                        </div>
+                        <p style="color: #666;">Todos los números que se multiplican ahí (2 y 3) son primos.</p>
+                        <p style="margin-top: 10px; font-weight: bold;">También se escribe como potencia: <span style="color: var(--primary-orange);">2<sup>2</sup> &times; 3</span></p>
+                    </div>
+                </div>
+
+                <!-- 6. Árbol de Factores -->
+                <div class="slide">
+                    <h2>Método: El Árbol de Factores</h2>
+                    <p>Es una técnica fácil para hacer una factorización prima. Vamos a descomponer el <strong>24</strong>.</p>
+                    
+                    <div class="factor-tree">
+                        <!-- Nivel 1 -->
+                        <div class="tree-node" style="border-color: var(--primary-orange);">24</div>
+                        
+                        <!-- Nivel 2 -->
+                        <div class="tree-row">
+                            <div class="line-left"></div>
+                            <div class="line-right"></div>
+                            <div class="tree-node prime">2</div>
+                            <div class="tree-node">12</div>
+                        </div>
+                        
+                        <!-- Nivel 3 -->
+                        <div class="tree-row" style="margin-left: 90px;">
+                            <div class="line-left"></div>
+                            <div class="line-right"></div>
+                            <div class="tree-node prime">2</div>
+                            <div class="tree-node">6</div>
+                        </div>
+
+                        <!-- Nivel 4 -->
+                        <div class="tree-row" style="margin-left: 180px;">
+                            <div class="line-left"></div>
+                            <div class="line-right"></div>
+                            <div class="tree-node prime">2</div>
+                            <div class="tree-node prime">3</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f0fdf4; padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px solid #bbf7d0;">
+                        <p>Cuando llegas a puros números primos (círculos verdes), ¡terminaste!</p>
+                        <p style="font-weight: bold; font-size: 1.2rem; color: var(--primary-green);">24 = 2 &times; 2 &times; 2 &times; 3 = 2<sup>3</sup> &times; 3</p>
+                    </div>
+                </div>
+
+                <!-- 7. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Primos y Compuestos</h2>
+                    <p>¿Cuál de los siguientes números es un <strong>número primo</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'El 9 tiene como factores 1, 3 y 9. Es compuesto.')">A) 9</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! El 11 solo puede dividirse entre 1 y 11.', '')">B) 11</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'El 10 termina en cero, por lo tanto es divisible entre 2 y 5. Es compuesto.')">C) 10</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: Reglas de Divisibilidad</h2>
+                    <p>El número <strong>45</strong> es divisible por...</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Para ser divisible por 2 debe terminar en número par (0, 2, 4, 6 u 8).')">A) Solo por 2</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Es divisible por 5, ¡pero también por otro número!')">B) Solo por 5</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Termina en 5, y la suma de sus cifras (4+5=9) es múltiplo de 3.', '')">C) Por 3 y por 5</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: Factorización Prima</h2>
+                    <p>¿Cuál es la <strong>factorización prima</strong> correcta del número <strong>18</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Esta es una multiplicación que da 18, pero el 9 NO es un número primo (es compuesto).')">A) 2 &times; 9</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Muy bien! Todos son números primos y 2 x 3 x 3 = 18. (También escrito 2 &times; 3&sup2;)', '')">B) 2 &times; 3 &times; 3</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Esta es otra multiplicación que da 18, pero el 6 NO es primo.')">C) 3 &times; 6</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🌟</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>Has aprendido a descomponer los números y a identificar sus bloques de construcción básicos.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem;">Volver a repasar</button>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

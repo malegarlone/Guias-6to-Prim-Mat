@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 14: Operaciones con Decimales</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #993921;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.22rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #444;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .op-card {
+            background: white;
+            border: 2px solid var(--primary-blue-dark);
+            border-radius: 10px;
+            padding: 15px;
+            width: 320px;
+            text-align: left;
+        }
+
+        .op-card h3 {
+            color: var(--primary-blue-dark);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .math-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-family: monospace;
+            font-size: 2.2rem;
+            background: #fff;
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: 2px dashed #cbd5e0;
+            width: fit-content;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .math-vertical .row {
+            letter-spacing: 5px;
+        }
+
+        .math-vertical .line {
+            border-top: 3px solid var(--primary-blue-dark);
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .math-vertical .sign {
+            position: absolute;
+            left: 20px;
+            bottom: 60px;
+            font-family: sans-serif;
+            color: var(--primary-orange);
+        }
+
+        .decimal-point {
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 5px solid var(--primary-yellow);
+            padding: 15px;
+            text-align: left;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 14: Operaciones con Decimales</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Portada 1 -->
+                <div class="slide active">
+                    <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🛒💵</div>
+                    <h1 style="font-size: 2.2rem;">Operaciones con Decimales</h1>
+                    <h2 style="font-weight: 600;">Lección 14 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic;">¡Aprende a manejar el dinero y las medidas exactas dominando el punto decimal!</p>
+                </div>
+
+                <!-- 2. Suma y Resta -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 0.5rem;">Suma y Resta</h2>
+                    <p>La regla de oro para sumar o restar decimales es: <strong>¡Alinear el punto decimal!</strong></p>
+                    
+                    <div class="flex-container">
+                        <div class="op-card" style="border-color: var(--primary-green);">
+                            <h3 style="color: var(--primary-green);">Suma: 12.5 + 3.42</h3>
+                            <div class="math-vertical">
+                                <span class="sign">+</span>
+                                <div class="row">12<span class="decimal-point">.</span>5<span style="color: #ccc;">0</span></div>
+                                <div class="row">03<span class="decimal-point">.</span>42</div>
+                                <div class="line"></div>
+                                <div class="row" style="color: var(--primary-green); font-weight: bold;">15<span class="decimal-point">.</span>92</div>
+                            </div>
+                            <p style="font-size: 0.85rem; text-align: center; margin-top: 10px;">Rellenamos con ceros los espacios vacíos.</p>
+                        </div>
+                        
+                        <div class="op-card" style="border-color: var(--primary-orange);">
+                            <h3 style="color: var(--primary-orange);">Resta: 5.2 - 1.85</h3>
+                            <div class="math-vertical">
+                                <span class="sign">-</span>
+                                <div class="row">5<span class="decimal-point">.</span>2<span style="color: #ccc;">0</span></div>
+                                <div class="row">1<span class="decimal-point">.</span>85</div>
+                                <div class="line"></div>
+                                <div class="row" style="color: var(--primary-orange); font-weight: bold;">3<span class="decimal-point">.</span>35</div>
+                            </div>
+                            <p style="font-size: 0.85rem; text-align: center; margin-top: 10px;">Pusimos un 0 al 5.2 para poder restar 85.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Multiplicación -->
+                <div class="slide">
+                    <h2>Multiplicación</h2>
+                    <p>Al multiplicar, <strong>ignoramos el punto decimal al principio</strong>. Multiplicamos como si fueran números enteros normales.</p>
+                    
+                    <div class="info-card">
+                        <p style="font-size: 1.2rem; font-weight: bold; color: var(--primary-purple); margin-bottom: 10px;">2.4 &times; 1.3 = ?</p>
+                        <ol style="text-align: left; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                            <li>Multiplicamos 24 &times; 13 = 312.</li>
+                            <li>Contamos cuántos números hay <strong>después</strong> del punto en total en la operación original.</li>
+                            <li><span style="color: var(--primary-red);">2.<strong>4</strong></span> (1 número) y <span style="color: var(--primary-red);">1.<strong>3</strong></span> (1 número) = ¡Son <strong>2</strong> lugares decimales en total!</li>
+                            <li>Colocamos el punto en el resultado (312) moviéndonos 2 lugares desde la derecha.</li>
+                            <li style="font-weight: bold; font-size: 1.3rem; text-align: center; color: var(--primary-blue-dark); margin-top: 10px;">Resultado: 3.12</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- 4. División -->
+                <div class="slide">
+                    <h2>División</h2>
+                    <p>Para dividir con decimales, usamos un truco: <strong>¡Convertir el divisor (el que divide) en un número entero!</strong></p>
+                    
+                    <div class="highlight-box" style="width: 100%; max-width: 700px;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 10px;">Ejemplo: 4.5 &divide; 0.5</h3>
+                        <p style="margin-bottom: 10px;">1. Movemos el punto del <strong>0.5</strong> un lugar a la derecha para que se vuelva <strong>5</strong>.</p>
+                        <p style="margin-bottom: 10px;">2. Como movimos el punto un lugar en el divisor, <strong>tenemos que hacer lo mismo</strong> en el dividendo: 4.5 se vuelve <strong>45</strong>.</p>
+                        <p style="font-size: 1.3rem; text-align: center; font-weight: bold; color: var(--primary-blue-dark);">¡La nueva operación es 45 &divide; 5 = 9!</p>
+                    </div>
+                </div>
+
+                <!-- 5. Otro ejemplo de división -->
+                <div class="slide">
+                    <h2>División: ¡Rellenando con ceros!</h2>
+                    <p>¿Qué pasa si al mover el punto nos quedamos sin números en el dividendo?</p>
+                    
+                    <div class="info-card" style="background: #e0f2fe; border: 2px solid #38bdf8;">
+                        <p style="font-size: 1.5rem; font-weight: bold; margin-bottom: 15px;">12 &divide; 0.04</p>
+                        
+                        <p style="text-align: left; margin-bottom: 10px;">👉 El divisor es <strong>0.04</strong>. Necesitamos mover el punto <strong>2 lugares</strong> a la derecha para que sea un <strong>4</strong>.</p>
+                        <p style="text-align: left; margin-bottom: 15px;">👉 Al dividendo (<strong>12</strong>) le agregamos el punto y movemos 2 lugares, rellenando con ceros: <strong>12.00 ➡️ 1200</strong>.</p>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 8px; font-size: 1.5rem; font-weight: bold; color: #0369a1;">
+                            1200 &divide; 4 = 300
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Repaso Visual -->
+                <div class="slide">
+                    <h2>Resumen de Reglas</h2>
+                    <div class="flex-container">
+                        <div class="op-card" style="width: 240px; text-align: center; border-color: var(--primary-green);">
+                            <div style="font-size: 30px;">➕➖</div>
+                            <h3 style="color: var(--primary-green);">Suma / Resta</h3>
+                            <p style="font-size: 0.9rem;">Alinear los puntos decimales uno sobre otro.</p>
+                        </div>
+                        <div class="op-card" style="width: 240px; text-align: center; border-color: var(--primary-orange);">
+                            <div style="font-size: 30px;">✖️</div>
+                            <h3 style="color: var(--primary-orange);">Multiplicación</h3>
+                            <p style="font-size: 0.9rem;">Multiplicar normal, luego contar y sumar los lugares decimales.</p>
+                        </div>
+                        <div class="op-card" style="width: 240px; text-align: center; border-color: #3b82f6;">
+                            <div style="font-size: 30px;">➗</div>
+                            <h3 style="color: #3b82f6;">División</h3>
+                            <p style="font-size: 0.9rem;">Mover el punto del divisor hasta que sea entero, y hacer lo mismo en el dividendo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Alinear los puntos</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        3.5 + 2.14 = ?
+                    </div>
+                    <p>Al hacer esta suma, ¿qué debemos hacer con el 3.5 para facilitar la operación?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Eso cambiaría completamente el valor a 35.')">A) Quitarle el punto para que sea 35.</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Agregamos un cero para que sea 3.50 y alinear correctamente los decimales.', '')">B) Agregarle un cero al final (3.50).</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Alinear los números a la derecha sin importar el punto es el error más común.')">C) Sumar el 5 con el 4 porque están al final.</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: Contar lugares decimales</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        0.2 &times; 0.3 = ?
+                    </div>
+                    <p>Si sabemos que 2 &times; 3 = 6. ¿Dónde va el punto decimal en el resultado?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Eso sería si hubiera solo un lugar decimal en total.')">A) 0.6</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', '¡Eso significa que multiplicaste por enteros!')">B) 6.0</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Tenemos 1 lugar decimal del 0.2 y 1 lugar del 0.3 = 2 lugares en total (0.06).', '')">C) 0.06</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: El truco de la división</h2>
+                    <div style="font-size: 2rem; margin-bottom: 15px;">
+                        1.5 &divide; 0.3 = ?
+                    </div>
+                    <p>Aplica el truco de mover el punto para convertir esto en una división de números enteros.</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Correcto! Movemos el punto un lugar en ambos y nos queda 15 &divide; 3 = 5.', '')">A) 5</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Mueve el punto en el 0.3 para que sea 3. Si haces lo mismo en 1.5, se vuelve 15. Ahora divide 15 entre 3.')">B) 0.5</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Parece que multiplicaste 15 por 3.')">C) 45</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🏆</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>Eres un maestro de los decimales. ¡Nada de números inexactos te asustará ahora!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem;">Volver a repasar</button>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>
