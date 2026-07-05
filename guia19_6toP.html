@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Didáctica 19: Gráficas Estadísticas - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #10b981;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 25px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.3rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #444;
+            max-width: 720px;
+            line-height: 1.4;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 0.5rem 0;
+            width: 100%;
+            max-width: 720px;
+            text-align: left;
+            border-left: 5px solid var(--primary-orange);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0.8rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        /* Fraction Math CSS */
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .math-numerator {
+            border-bottom: 2px solid currentColor;
+            padding: 0 5px;
+            width: 100%;
+        }
+
+        .math-denominator {
+            padding: 2px 5px 0 5px;
+            width: 100%;
+        }
+
+        /* Visual grids */
+        .types-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 760px;
+        }
+
+        .type-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .type-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        /* Live graphics studio layout */
+        .studio-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 5px;
+        }
+
+        .studio-controls {
+            flex: 1;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary-blue-dark);
+        }
+
+        .input-group input {
+            padding: 5px 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-orange);
+        }
+
+        .studio-charts {
+            flex: 2;
+            display: flex;
+            gap: 10px;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .chart-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chart-box h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            color: var(--primary-blue-dark);
+        }
+
+        /* SVG graphics */
+        .bar-svg, .pie-svg {
+            background: #fdfaf6;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 19: Gráficas Estadísticas</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div style="font-size: 70px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">📈🥧</div>
+                    <h1 style="font-size: 2.2rem; margin-top: 10px;">Elaboración e Interpretación de Gráficas</h1>
+                    <h2 style="font-weight: 600; color: #64748b; font-size: 1.5rem;">Guía Didáctica 19 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 1rem;">Descubre cómo transformar listas de números en imágenes comprensibles y sectores circulares exactos.</p>
+                </div>
+
+                <!-- Slide 2: Importancia -->
+                <div class="slide">
+                    <h2>¿Por qué usamos gráficas?</h2>
+                    <p style="margin-bottom: 10px;">Una gráfica es una representación visual de los datos de una tabla. Nos permite comparar cantidades, identificar tendencias y entender la información de un solo vistazo.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-blue-dark); background: #f8fafc; font-size: 1.1rem;">
+                        <p><strong>El cerebro humano procesa las imágenes mucho más rápido que el texto o los números sueltos.</strong> Por eso, las gráficas son herramientas muy poderosas en las ciencias y los negocios.</p>
+                    </div>
+                    <div style="font-size: 2.5rem; margin-top: 10px;">💡👁️</div>
+                </div>
+
+                <!-- Slide 3: Tipos de Gráficas -->
+                <div class="slide">
+                    <h2>Diferentes Formas de Mostrar Datos</h2>
+                    <div class="types-grid">
+                        <div class="type-card" style="border-top: 4px solid var(--primary-orange);">
+                            <h3>Gráficos de Barras</h3>
+                            <p style="font-size: 0.85rem; color: #555; margin-top: 5px;">Muestran barras (verticales u horizontales) para comparar categorías. La altura o longitud representa el valor.</p>
+                        </div>
+                        <div class="type-card" style="border-top: 4px solid var(--primary-yellow);">
+                            <h3>Pictogramas</h3>
+                            <p style="font-size: 0.85rem; color: #555; margin-top: 5px;">Utilizan dibujos o iconos temáticos para representar cantidades (ej: una manzana representa 5 manzanas vendidas).</p>
+                        </div>
+                        <div class="type-card" style="border-top: 4px solid var(--primary-purple);">
+                            <h3>Polígono de Frecuencias</h3>
+                            <p style="font-size: 0.85rem; color: #555; margin-top: 5px;">Una línea que conecta los puntos más altos de las frecuencias de cada categoría. Muestra fluctuaciones.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Gráfico Circular -->
+                <div class="slide">
+                    <h2>El Secreto de la Gráfica Circular</h2>
+                    <p style="margin-bottom: 10px;">También llamada gráfico de pastel. Muestra las partes de un todo. Para hacer un gráfico circular exacto, debemos convertir cada porcentaje a grados de un círculo:</p>
+                    
+                    <div class="info-card" style="border-left-color: var(--primary-purple); background: #f5f3ff;">
+                        <p style="font-size: 1.15rem; color: #5b21b6; text-align: center;">
+                            Fórmula para calcular el sector:<br>
+                            <strong>Ángulo (&deg;)</strong> = <span class="math-fraction"><span class="math-numerator">Frecuencia Absoluta</span><span class="math-denominator">Total de Datos</span></span> &times; 360&deg;
+                        </p>
+                    </div>
+                    <p>Como una circunferencia tiene exactamente 360&deg;, multiplicamos la frecuencia relativa por 360 para obtener el tamaño exacto del sector.</p>
+                </div>
+
+                <!-- Slide 5: Diseñador Interactivo -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">Diseñador de Gráficos en Tiempo Real 🎨</h2>
+                    <p style="margin-bottom: 10px; font-size: 0.95rem;">Modifica los valores de los deportes preferidos y observa cómo se dibujan las gráficas.</p>
+                    
+                    <div class="studio-layout">
+                        <!-- Controls -->
+                        <div class="studio-controls">
+                            <div class="input-group">
+                                <label style="color: var(--primary-orange);">⚽ Fútbol (0 a 10):</label>
+                                <input type="number" id="val-sport-1" value="5" min="0" max="10" oninput="drawCharts()">
+                            </div>
+                            <div class="input-group">
+                                <label style="color: var(--primary-yellow);">🏀 Baloncesto (0 a 10):</label>
+                                <input type="number" id="val-sport-2" value="3" min="0" max="10" oninput="drawCharts()">
+                            </div>
+                            <div class="input-group">
+                                <label style="color: var(--primary-blue-dark);">🏊 Natación (0 a 10):</label>
+                                <input type="number" id="val-sport-3" value="2" min="0" max="10" oninput="drawCharts()">
+                            </div>
+                            <div id="chart-math" style="font-size: 0.8rem; background: #fffbeb; padding: 6px; border-radius: 6px; border: 1px solid #fef3c7; line-height: 1.3;">
+                                Total: 10 alumnos.<br>
+                                Sector Fútbol: 5/10 × 360&deg; = 180&deg;
+                            </div>
+                        </div>
+
+                        <!-- Displays -->
+                        <div class="studio-charts">
+                            <div class="chart-box">
+                                <h4>Gráfica de Barras</h4>
+                                <svg class="bar-svg" width="160" height="150" id="bar-svg-container">
+                                    <!-- Dynamic bars -->
+                                </svg>
+                            </div>
+                            <div class="chart-box">
+                                <h4>Gráfica Circular</h4>
+                                <svg class="pie-svg" width="160" height="150" viewBox="0 0 100 100" id="pie-svg-container">
+                                    <!-- Dynamic sectors -->
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: QUIZ 1 -->
+                <div class="slide">
+                    <h2>Reto de Ángulos</h2>
+                    <p style="margin-bottom: 10px;">Si realizas una encuesta sobre mascotas a <strong>20 personas</strong> y exactamente <strong>10 personas</strong> responden que tienen perros: ¿De cuántos grados (&deg;) debe ser el sector de los perros en el gráfico circular?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Recuerda que 10 personas es la mitad de 20. Así que el sector debe ser la mitad del círculo.')">A) 90&deg; (un cuarto del círculo)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Como 10 de 20 representa la mitad (1/2), multiplicamos 1/2 × 360&deg; = 180&deg; (medio círculo).', '')">B) 180&deg; (medio círculo)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', '360&deg; es el círculo completo. Eso significaría que las 20 personas tienen perros.')">C) 360&deg; (círculo completo)</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 7: QUIZ 2 -->
+                <div class="slide">
+                    <h2>Reto del Pictograma</h2>
+                    <p style="margin-bottom: 10px;">En un pictograma de una biblioteca, cada icono de un libro (📖) representa <strong>4 libros reales</strong>. Si en la categoría de Ciencias hay <strong>3 iconos (📖📖📖)</strong>: ¿Cuántos libros de Ciencias hay en total?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Cuidado. No sumaste el valor real que representa cada icono. Cada libro vale 4 unidades.')">A) 3 libros</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Casi, pero revisa bien la multiplicación: 3 iconos × 4 unidades por icono.')">B) 7 libros</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Fantástico! Cada 📖 representa 4 libros, así que 3 📖 × 4 = 12 libros en total.', '')">C) 12 libros</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 8: QUIZ 3 -->
+                <div class="slide">
+                    <h2>Reto de Gráficos</h2>
+                    <p style="margin-bottom: 10px;">¿Cuál de las siguientes gráficas es la más adecuada si queremos mostrar la <strong>tendencia o fluctuación de temperatura</strong> a lo largo de los 12 meses del año?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Extraordinario! El polígono de frecuencias (o gráfico de líneas) es perfecto para mostrar el cambio continuo en el tiempo.', '')">A) Polígono de frecuencias (líneas)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Los gráficos circulares son para comparar partes de un todo, no tendencias continuas.')">B) Gráfico circular (de pastel)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Los pictogramas usan iconos para contar unidades fijas de categorías separadas.')">C) Pictograma</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 9: Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Eres todo un maestro interpretando y elaborando gráficas estadísticas!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 9</span>
+        </div>
+        <div class="progress-bar-container" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: #e2e8f0; z-index: 100;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Live chart studio rendering
+        function getCoordinatesForPercent(percent) {
+            const angle = 2 * Math.PI * percent - Math.PI / 2;
+            const x = Math.cos(angle);
+            const y = Math.sin(angle);
+            return [x, y];
+        }
+
+        function drawCharts() {
+            const val1 = parseFloat(document.getElementById('val-sport-1').value) || 0;
+            const val2 = parseFloat(document.getElementById('val-sport-2').value) || 0;
+            const val3 = parseFloat(document.getElementById('val-sport-3').value) || 0;
+            const total = val1 + val2 + val3;
+            
+            const mathEl = document.getElementById('chart-math');
+            if (total === 0) {
+                mathEl.innerHTML = "Ingresa al menos un valor mayor a 0.";
+                return;
+            }
+            
+            const a1 = (val1 / total) * 360;
+            mathEl.innerHTML = `Total: ${total} alumnos.<br>Ángulo Fútbol: <span class="math-fraction"><span class="math-numerator">${val1}</span><span class="math-denominator">${total}</span></span> &times; 360&deg; = <strong>${a1.toFixed(0)}&deg;</strong>`;
+            
+            // 1. Draw Bar Chart
+            const barContainer = document.getElementById('bar-svg-container');
+            barContainer.innerHTML = "";
+            const vals = [val1, val2, val3];
+            const colors = ['var(--primary-orange)', 'var(--primary-yellow)', 'var(--primary-blue-dark)'];
+            const names = ['Fút', 'Bas', 'Nat'];
+            
+            vals.forEach((v, i) => {
+                const barHeight = total > 0 ? (v / 10) * 110 : 0; // max input is 10, scale to 110px
+                const y = 120 - barHeight;
+                const x = 20 + i * 45;
+                
+                // Add rect
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', 30);
+                rect.setAttribute('height', barHeight);
+                rect.setAttribute('fill', colors[i]);
+                rect.setAttribute('rx', 4);
+                barContainer.appendChild(rect);
+                
+                // Add label
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', x + 15);
+                label.setAttribute('y', 138);
+                label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('font-size', '10px');
+                label.setAttribute('font-weight', 'bold');
+                label.setAttribute('fill', '#64748b');
+                label.textContent = `${names[i]} (${v})`;
+                barContainer.appendChild(label);
+            });
+            
+            // 2. Draw Pie Chart
+            const pieContainer = document.getElementById('pie-svg-container');
+            pieContainer.innerHTML = "";
+            let cumulativePercent = 0;
+            
+            vals.forEach((v, i) => {
+                const percent = v / total;
+                if (percent === 0) return;
+                
+                // If it is 100%, render a simple circle
+                if (percent === 1) {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', 50);
+                    circle.setAttribute('cy', 50);
+                    circle.setAttribute('r', 40);
+                    circle.setAttribute('fill', colors[i]);
+                    pieContainer.appendChild(circle);
+                    return;
+                }
+                
+                const [startX, startY] = getCoordinatesForPercent(cumulativePercent);
+                cumulativePercent += percent;
+                const [endX, endY] = getCoordinatesForPercent(cumulativePercent);
+                
+                const x1 = 50 + startX * 40;
+                const y1 = 50 + startY * 40;
+                const x2 = 50 + endX * 40;
+                const y2 = 50 + endY * 40;
+                
+                const largeArcFlag = percent > 0.5 ? 1 : 0;
+                
+                const pathData = `
+                    M 50 50
+                    L ${x1} ${y1}
+                    A 40 40 0 ${largeArcFlag} 1 ${x2} ${y2}
+                    Z
+                `;
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData);
+                path.setAttribute('fill', colors[i]);
+                path.setAttribute('stroke', 'white');
+                path.setAttribute('stroke-width', '1.5');
+                pieContainer.appendChild(path);
+            });
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        drawCharts();
+        updateGallery();
+    </script>
+</body>
+
+</html>

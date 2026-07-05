@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Didáctica 17: Regla de Tres - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #10b981;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.3rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.15rem;
+            color: #444;
+            max-width: 720px;
+            line-height: 1.5;
+        }
+
+        .info-card {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 0.8rem 0;
+            width: 100%;
+            max-width: 720px;
+            text-align: left;
+            border-left: 5px solid var(--primary-orange);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        /* Fraction Math CSS */
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .math-numerator {
+            border-bottom: 2px solid currentColor;
+            padding: 0 5px;
+            width: 100%;
+        }
+
+        .math-denominator {
+            padding: 2px 5px 0 5px;
+            width: 100%;
+        }
+
+        /* Tabs styling */
+        .tabs-header {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 720px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--primary-blue-dark);
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom: 2px solid white;
+            border-color: #cbd5e1 #cbd5e1 white;
+            color: var(--primary-orange);
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            max-width: 720px;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .calc-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .calc-input-group label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary-blue-dark);
+        }
+
+        .calc-input-group input {
+            padding: 6px 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+        }
+
+        .calc-input-group input:focus {
+            border-color: var(--primary-orange);
+        }
+
+        .calc-result-box {
+            grid-column: span 2;
+            background: #fffbeb;
+            border: 2px dashed var(--primary-yellow);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 17: Regla de Tres</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div style="font-size: 70px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">⚖️⚡</div>
+                    <h1 style="font-size: 2.2rem; margin-top: 10px;">Regla de Tres Simple y Compuesta</h1>
+                    <h2 style="font-weight: 600; color: #64748b; font-size: 1.5rem;">Guía Didáctica 17 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 1rem;">Descubre cómo calcular valores ocultos usando la proporcionalidad directa, inversa y compuesta.</p>
+                </div>
+
+                <!-- Slide 2: Objetivos -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 10px;">¿Qué aprenderemos hoy?</h2>
+                    <div class="info-card" style="border-left-color: var(--primary-blue-dark); background: #f8fafc; max-width: 600px;">
+                        <ul style="list-style-type: none; font-size: 1.15rem; line-height: 1.8; color: var(--primary-blue-dark);">
+                            <li>🎯 <strong>Identificar</strong> si dos magnitudes son directa o inversamente proporcionales.</li>
+                            <li>⚡ <strong>Resolver</strong> problemas reales usando la Regla de Tres Simple.</li>
+                            <li>🧩 <strong>Calcular</strong> incógnitas complejas con la Regla de Tres Compuesta.</li>
+                        </ul>
+                    </div>
+                    <div style="font-size: 3rem; margin-top: 1rem;">🧗</div>
+                </div>
+
+                <!-- Slide 3: Proporcionalidad Directa -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">1. Proporcionalidad Directa</h2>
+                    <p style="margin-bottom: 10px;">Ocurre cuando dos magnitudes van en la <strong>misma dirección</strong>: si una aumenta, la otra también aumenta en la misma proporción; y si una disminuye, la otra también disminuye.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-green); background: #f0fdf4;">
+                        <p style="font-size: 1.1rem; color: #166534;">
+                            <strong>Ejemplo cotidiano:</strong> Si 2 lápices cuestan Q10, entonces el doble de lápices (4) costará el doble de dinero (Q20).<br>
+                            ➔ A más lápices comprados, mayor es el costo total.
+                        </p>
+                    </div>
+                    <div style="font-size: 2.5rem; margin-top: 5px;">✏️💰</div>
+                </div>
+
+                <!-- Slide 4: Proporcionalidad Inversa -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">2. Proporcionalidad Inversa</h2>
+                    <p style="margin-bottom: 10px;">Ocurre cuando dos magnitudes van en <strong>direcciones opuestas</strong>: si una aumenta, la otra disminuye; y si una disminuye, la otra aumenta.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-red); background: #fef2f2;">
+                        <p style="font-size: 1.1rem; color: #991b1b;">
+                            <strong>Ejemplo cotidiano:</strong> Si 2 pintores tardan 6 horas en pintar una barda, al duplicar la cantidad de pintores (4) se tardará la mitad del tiempo (3 horas).<br>
+                            ➔ A más trabajadores ayudando, menos horas de trabajo se requieren.
+                        </p>
+                    </div>
+                    <div style="font-size: 2.5rem; margin-top: 5px;">👷⏱️</div>
+                </div>
+
+                <!-- Slide 5: Regla de Tres Compuesta -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">3. Regla de Tres Compuesta</h2>
+                    <p style="margin-bottom: 10px;">Se aplica cuando intervienen <strong>tres o más magnitudes</strong> proporcionales al mismo tiempo. Es la combinación de dos o más reglas de tres simples.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-purple); background: #f5f3ff;">
+                        <p style="font-size: 1.1rem; color: #5b21b6;">
+                            <strong>Ejemplo cotidiano:</strong> Si 5 gallinas ponen 10 huevos en 2 días, ¿cuántos huevos pondrán 10 gallinas en 4 días?<br>
+                            Aquí intervienen 3 elementos: la cantidad de gallinas, el número de días y el total de huevos.
+                        </p>
+                    </div>
+                    <div style="font-size: 2.5rem; margin-top: 5px;">🐔🥚📅</div>
+                </div>
+
+                <!-- Slide 6: Calculadora Interactiva -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 10px;">Simulador de Regla de Tres</h2>
+                    
+                    <div class="tabs-header">
+                        <button class="tab-btn active" onclick="switchTab('direct-tab', this)">Simple Directa</button>
+                        <button class="tab-btn" onclick="switchTab('inverse-tab', this)">Simple Inversa</button>
+                        <button class="tab-btn" onclick="switchTab('compound-tab', this)">Compuesta</button>
+                    </div>
+
+                    <!-- Tab Directa -->
+                    <div class="tab-content active" id="direct-tab">
+                        <div class="calc-grid">
+                            <div class="calc-input-group">
+                                <label>Si A vale:</label>
+                                <input type="number" id="dir-a" value="2" oninput="calcDirect()">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Produce B:</label>
+                                <input type="number" id="dir-b" value="10" oninput="calcDirect()">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Entonces C vale:</label>
+                                <input type="number" id="dir-c" value="6" oninput="calcDirect()">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>¿Cuánto es X?</label>
+                                <input type="text" id="dir-x" value="?" readonly style="background: #f1f5f9;">
+                            </div>
+                            <div class="calc-result-box" id="dir-steps">
+                                Planteamiento: 6 × 10 / 2 = 30
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Inversa -->
+                    <div class="tab-content" id="inverse-tab">
+                        <div class="calc-grid">
+                            <div class="calc-input-group">
+                                <label>Si A vale:</label>
+                                <input type="number" id="inv-a" value="2" oninput="calcInverse()">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Tarda B:</label>
+                                <input type="number" id="inv-b" value="6" oninput="calcInverse()">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Entonces C vale:</label>
+                                <input type="number" id="inv-c" value="4" oninput="calcInverse()">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>¿Cuánto es X?</label>
+                                <input type="text" id="inv-x" value="?" readonly style="background: #f1f5f9;">
+                            </div>
+                            <div class="calc-result-box" id="inv-steps">
+                                Planteamiento: 2 × 6 / 4 = 3
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Compuesta -->
+                    <div class="tab-content" id="compound-tab">
+                        <p style="font-size: 0.9rem; margin-bottom: 10px; color: #555;">Ejemplo: Gallinas (G) ➔ Días (D) ➔ Hueos (H). (Directa-Directa)</p>
+                        <div class="calc-grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <div class="calc-input-group">
+                                <label>Gallinas 1:</label>
+                                <input type="number" id="comp-g1" value="5" oninput="calcCompound()" style="padding: 4px 8px;">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Días 1:</label>
+                                <input type="number" id="comp-d1" value="2" oninput="calcCompound()" style="padding: 4px 8px;">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Huevos 1:</label>
+                                <input type="number" id="comp-h1" value="10" oninput="calcCompound()" style="padding: 4px 8px;">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Gallinas 2:</label>
+                                <input type="number" id="comp-g2" value="10" oninput="calcCompound()" style="padding: 4px 8px;">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Días 2:</label>
+                                <input type="number" id="comp-d2" value="4" oninput="calcCompound()" style="padding: 4px 8px;">
+                            </div>
+                            <div class="calc-input-group">
+                                <label>Huevos 2 (X):</label>
+                                <input type="text" id="comp-x" value="?" readonly style="background: #f1f5f9; padding: 4px 8px;">
+                            </div>
+                            <div class="calc-result-box" id="comp-steps" style="grid-column: span 3; font-size: 0.95rem; padding: 6px;">
+                                Cálculo: (10 × 4 × 10) / (5 × 2) = 40 huevos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 7: QUIZ 1 -->
+                <div class="slide">
+                    <h2>Reto de Relación</h2>
+                    <p style="margin-bottom: 10px;">Si un vehículo viaja a una velocidad constante y quiere llegar a su destino: ¿Cómo es la relación entre la <strong>velocidad</strong> y el <strong>tiempo</strong> que tarda?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Al revés. Si vas más rápido (más velocidad), vas a tardar menos tiempo (disminuye). Ambas van en direcciones opuestas.')">A) Directamente proporcional</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Excelente! A mayor velocidad, se tarda menos tiempo en llegar. Una sube y la otra baja.', '')">B) Inversamente proporcional</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Recuerda que si una magnitud sube y la otra baja de forma constante, sí existe una relación de proporcionalidad.')">C) No tienen ninguna relación</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 8: QUIZ 2 -->
+                <div class="slide">
+                    <h2>Reto de Construcción</h2>
+                    <p style="margin-bottom: 10px;">Si 3 obreros tardan 8 días en construir una barda, ¿cuántos días tardarán 6 obreros en hacer el mismo trabajo?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', '¡Cuidado! A más obreros trabajando, deberían tardar MENOS tiempo, no más tiempo. Es proporcionalidad inversa.')">A) 16 días</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Casi, pero recuerda calcular exactamente: (3 obreros × 8 días) / 6 obreros.')">B) 2 días</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Correcto! Al duplicar los obreros (de 3 a 6), el tiempo se reduce a la mitad (de 8 a 4 días).', '')">C) 4 días</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 9: QUIZ 3 -->
+                <div class="slide">
+                    <h2>Reto Compuesto</h2>
+                    <p style="margin-bottom: 5px;">Si 4 grifos de agua llenan 2 albercas en 6 horas, ¿cuántas horas tardarán 8 grifos en llenar 4 albercas?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Espectacular! Al duplicar los grifos se llena el doble de rápido, pero como también se duplicó el número de albercas, el tiempo final sigue siendo exactamente 6 horas.', '')">A) 6 horas</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Recuerda plantear los factores: (4 albercas × 4 grifos iniciales × 6 horas) / (2 albercas iniciales × 8 grifos finales) = 96 / 16 = 6 horas.')">B) 3 horas</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Haz el cálculo formal con los factores directos de las albercas e inversos de los grifos.')">C) 12 horas</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 10: Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Eres un experto resolviendo la regla de tres simple y compuesta!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+        <div class="progress-bar-container" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: #e2e8f0; z-index: 100;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Tab selection logic
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Calculation logic
+        function calcDirect() {
+            const a = parseFloat(document.getElementById('dir-a').value) || 1;
+            const b = parseFloat(document.getElementById('dir-b').value) || 0;
+            const c = parseFloat(document.getElementById('dir-c').value) || 0;
+            const x = (c * b) / a;
+            document.getElementById('dir-x').value = x.toFixed(2).replace('.00', '');
+            
+            // Format fraction vertically using helper styling
+            document.getElementById('dir-steps').innerHTML = `Planteamiento: <span class="math-fraction"><span class="math-numerator">${c} &times; ${b}</span><span class="math-denominator">${a}</span></span> = <strong>${x.toFixed(2).replace('.00', '')}</strong>`;
+        }
+
+        function calcInverse() {
+            const a = parseFloat(document.getElementById('inv-a').value) || 1;
+            const b = parseFloat(document.getElementById('inv-b').value) || 0;
+            const c = parseFloat(document.getElementById('inv-c').value) || 1;
+            const x = (a * b) / c;
+            document.getElementById('inv-x').value = x.toFixed(2).replace('.00', '');
+            
+            document.getElementById('inv-steps').innerHTML = `Planteamiento: <span class="math-fraction"><span class="math-numerator">${a} &times; ${b}</span><span class="math-denominator">${c}</span></span> = <strong>${x.toFixed(2).replace('.00', '')}</strong>`;
+        }
+
+        function calcCompound() {
+            const g1 = parseFloat(document.getElementById('comp-g1').value) || 1;
+            const d1 = parseFloat(document.getElementById('comp-d1').value) || 1;
+            const h1 = parseFloat(document.getElementById('comp-h1').value) || 0;
+            const g2 = parseFloat(document.getElementById('comp-g2').value) || 0;
+            const d2 = parseFloat(document.getElementById('comp-d2').value) || 0;
+            
+            const x = (g2 * d2 * h1) / (g1 * d1);
+            document.getElementById('comp-x').value = x.toFixed(2).replace('.00', '');
+            
+            document.getElementById('comp-steps').innerHTML = `Planteamiento: <span class="math-fraction"><span class="math-numerator">${g2} &times; ${d2} &times; ${h1}</span><span class="math-denominator">${g1} &times; ${d1}</span></span> = <strong>${x.toFixed(2).replace('.00', '')} huevos</strong>`;
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        // Initialize calculators
+        calcDirect();
+        calcInverse();
+        calcCompound();
+        updateGallery();
+    </script>
+</body>
+
+</html>

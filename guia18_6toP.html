@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Didáctica 18: Tablas Estadísticas - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #10b981;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 25px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.3rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #444;
+            max-width: 720px;
+            line-height: 1.4;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 0.5rem 0;
+            width: 100%;
+            max-width: 720px;
+            text-align: left;
+            border-left: 5px solid var(--primary-orange);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0.8rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        /* Statistical Vocabulary grid */
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 760px;
+        }
+
+        .vocab-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .vocab-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        /* Active tally workshop layout */
+        .workshop-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 760px;
+            margin-top: 10px;
+        }
+
+        .census-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            flex: 1;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+        }
+
+        .census-cell {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .census-cell.clicked {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #15803d;
+            text-decoration: line-through;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .tally-table {
+            border-collapse: collapse;
+            flex: 1.1;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .tally-table th, .tally-table td {
+            border: 1px solid #e2e8f0;
+            padding: 8px 10px;
+            text-align: center;
+        }
+
+        .tally-table th {
+            background: var(--primary-blue-dark);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        .tally-dots {
+            color: var(--primary-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: left !important;
+            letter-spacing: 2px;
+            padding-left: 15px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 18: Tablas Estadísticas</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div style="font-size: 70px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">📊📋</div>
+                    <h1 style="font-size: 2.2rem; margin-top: 10px;">Elaboración de Tablas Estadísticas</h1>
+                    <h2 style="font-weight: 600; color: #64748b; font-size: 1.5rem;">Guía Didáctica 18 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 1rem;">Aprende a recopilar, organizar y tabular información recolectada del mundo real.</p>
+                </div>
+
+                <!-- Slide 2: Conceptos Estadísticos -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">Conceptos Clave de la Estadística</h2>
+                    <p>Antes de tabular, debemos conocer los elementos básicos de una encuesta:</p>
+                    <div class="vocab-grid">
+                        <div class="vocab-card" style="border-top: 4px solid var(--primary-orange);">
+                            <h3>Población</h3>
+                            <p style="font-size: 0.9rem; color: #555;">Conjunto total de sujetos o elementos de interés para un estudio (ej: todos los estudiantes del colegio).</p>
+                        </div>
+                        <div class="vocab-card" style="border-top: 4px solid var(--primary-yellow);">
+                            <h3>Muestra</h3>
+                            <p style="font-size: 0.9rem; color: #555;">Un subconjunto pequeño representativo seleccionado de la población (ej: los alumnos de 6to A).</p>
+                        </div>
+                        <div class="vocab-card" style="border-top: 4px solid var(--primary-blue-dark);">
+                            <h3>Elemento</h3>
+                            <p style="font-size: 0.9rem; color: #555;">Cada uno de los individuos o sujetos individuales que componen la población (ej: un estudiante).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: ¿Qué es la Frecuencia? -->
+                <div class="slide">
+                    <h2>¿Qué es la Frecuencia?</h2>
+                    <div class="info-card" style="margin-bottom: 15px;">
+                        <p style="font-size: 1.2rem; line-height: 1.6; color: var(--primary-blue-dark);">
+                            <strong>Frecuencia:</strong> Es el número de veces que se repite un mismo dato en una lista de valores observados.
+                        </p>
+                    </div>
+                    <p>Tabular significa ordenar y estructurar la variable en estudio junto a su frecuencia para poder analizarla mejor.</p>
+                    <div style="font-size: 3rem; margin-top: 10px;">🔢📈</div>
+                </div>
+
+                <!-- Slide 4: Tipos de Tablas -->
+                <div class="slide">
+                    <h2>Clasificación de Tablas Estadísticas</h2>
+                    <div style="display: flex; gap: 15px; width: 100%; max-width: 760px; margin-top: 10px;">
+                        <div class="vocab-card" style="flex: 1; border-top: 4px solid var(--primary-purple);">
+                            <h3>Tablas Tipo I</h3>
+                            <p style="font-size: 0.95rem; color: #444; line-height: 1.4; margin-top: 5px;">Se usan cuando el número de datos es pequeño y no se repiten mucho. No requieren agrupaciones especiales, simplemente se listan de forma ordenada en filas o columnas.</p>
+                        </div>
+                        <div class="vocab-card" style="flex: 1; border-top: 4px solid var(--primary-green);">
+                            <h3>Tablas Tipo II</h3>
+                            <p style="font-size: 0.95rem; color: #444; line-height: 1.4; margin-top: 5px;">Se elaboran para poblaciones más grandes donde los valores de la variable se repiten frecuentemente. Agrupan los datos mostrando cada valor con su respectiva frecuencia.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Taller interactivo de recuento -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">Taller de Recuento Activo (Hermanos)</h2>
+                    <p id="tally-status" style="font-weight: 600; color: var(--primary-orange);">Toca los números en la cuadrícula de datos obtenidos para hacer el recuento.</p>
+                    
+                    <div class="workshop-layout">
+                        <!-- Grid de 30 celdas -->
+                        <div class="census-grid" id="census-container">
+                            <!-- JS populated cells -->
+                        </div>
+
+                        <!-- Tabla de Frecuencias Tipo II -->
+                        <table class="tally-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Hermanos</th>
+                                    <th>Recuento</th>
+                                    <th>Frecuencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="row-0">
+                                    <td>0 hermanos</td>
+                                    <td class="tally-dots" id="dots-0"></td>
+                                    <td id="freq-0" style="font-weight: bold;">0</td>
+                                </tr>
+                                <tr id="row-1">
+                                    <td>1 hermano</td>
+                                    <td class="tally-dots" id="dots-1"></td>
+                                    <td id="freq-1" style="font-weight: bold;">0</td>
+                                </tr>
+                                <tr id="row-2">
+                                    <td>2 hermanos</td>
+                                    <td class="tally-dots" id="dots-2"></td>
+                                    <td id="freq-2" style="font-weight: bold;">0</td>
+                                </tr>
+                                <tr id="row-3">
+                                    <td>3 hermanos</td>
+                                    <td class="tally-dots" id="dots-3"></td>
+                                    <td id="freq-3" style="font-weight: bold;">0</td>
+                                </tr>
+                                <tr id="row-4">
+                                    <td>4 hermanos</td>
+                                    <td class="tally-dots" id="dots-4"></td>
+                                    <td id="freq-4" style="font-weight: bold;">0</td>
+                                </tr>
+                                <tr style="background: #f1f5f9; font-weight: bold;">
+                                    <td>Total</td>
+                                    <td>Recuento listo</td>
+                                    <td id="freq-total">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Slide 6: QUIZ 1 -->
+                <div class="slide">
+                    <h2>Reto Conceptual</h2>
+                    <p style="margin-bottom: 10px;">Si realizas un estudio para conocer la comida favorita de todos los alumnos de tu escuela y encuestas a <strong>15 alumnos de cada sección</strong>: ¿Qué representa este grupo seleccionado?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'La población es la totalidad de los alumnos de la escuela. Los 15 estudiantes por sección son una parte.')">A) La Población</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Es un subconjunto tomado de la población total para realizar el análisis.', '')">B) La Muestra</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Un elemento o individuo se refiere a un solo estudiante encuestado, no al grupo.')">C) El Elemento</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 7: QUIZ 2 -->
+                <div class="slide">
+                    <h2>Reto del Recuento</h2>
+                    <p style="margin-bottom: 10px;">En nuestro taller de conteo de hermanos mayores de 12 años, ¿cuál fue la <strong>Frecuencia Absoluta</strong> de estudiantes que tenían exactamente <strong>1 hermano</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Solo 2 estudiantes respondieron tener 0 hermanos. Para 1 hermano fue la mayor cantidad.')">A) 2 estudiantes</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Esa es la frecuencia de alumnos que tienen 2 hermanos.')">B) 9 estudiantes</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! La frecuencia para 1 hermano fue de 11, siendo el dato con mayor repetición (la moda).', '')">C) 11 estudiantes</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 8: QUIZ 3 -->
+                <div class="slide">
+                    <h2>Reto de Clasificación</h2>
+                    <p style="margin-bottom: 10px;">¿Qué tipo de tabla estadística se debe utilizar si estamos registrando una encuesta grande donde muchos valores se repiten constantemente?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Las tablas de Tipo I se usan cuando los valores son únicos y se presentan de forma simple sin agrupar.')">A) Tabla Tipo I</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Extraordinario! Las tablas de Tipo II se diseñan precisamente para resumir valores repetidos junto a sus frecuencias correspondientes.', '')">B) Tabla Tipo II</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'La regla de tres es una herramienta para resolver proporciones, no un tipo de tabla.')">C) Tabla de Regla de Tres</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 9: Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Has completado con éxito la lección sobre elaboración de tablas estadísticas!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver a jugar</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 9</span>
+        </div>
+        <div class="progress-bar-container" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: #e2e8f0; z-index: 100;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Tally active workshop logic
+        const rawData = [
+            1, 2, 0, 3, 1, 1,
+            2, 2, 1, 2, 2, 2,
+            1, 1, 3, 2, 2, 1,
+            1, 3, 3, 4, 1, 3,
+            3, 0, 1, 3, 2, 1
+        ];
+
+        let clickedCount = 0;
+        const groupFrequencies = {0: 0, 1: 0, 2: 0, 3: 0, 4: 0};
+
+        function setupWorkshop() {
+            const grid = document.getElementById('census-container');
+            grid.innerHTML = "";
+            rawData.forEach((val, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'census-cell';
+                cell.innerText = val;
+                cell.onclick = () => registerTally(val, cell);
+                grid.appendChild(cell);
+            });
+        }
+
+        function registerTally(val, cell) {
+            cell.classList.add('clicked');
+            clickedCount++;
+            
+            groupFrequencies[val]++;
+            
+            // Render tally dots
+            const dotsEl = document.getElementById(`dots-${val}`);
+            dotsEl.innerText = "•".repeat(groupFrequencies[val]);
+            
+            // Render frequency value
+            document.getElementById(`freq-${val}`).innerText = groupFrequencies[val];
+            document.getElementById('freq-total').innerText = clickedCount;
+            
+            if (clickedCount === 30) {
+                document.getElementById('tally-status').innerHTML = "🎉 ¡Excelente! Has completado el recuento de los 30 estudiantes con éxito.";
+                document.getElementById('tally-status').style.color = "var(--primary-green)";
+            } else {
+                document.getElementById('tally-status').innerText = `Contados: ${clickedCount} / 30. ¡Sigue haciendo clic!`;
+            }
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        setupWorkshop();
+        updateGallery();
+    </script>
+</body>
+
+</html>

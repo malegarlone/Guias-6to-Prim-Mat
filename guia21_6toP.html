@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Didáctica 21: Sistema Internacional vs Inglés - 6to Primaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #10b981;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 25px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.3rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #444;
+            max-width: 720px;
+            line-height: 1.4;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 0.5rem 0;
+            width: 100%;
+            max-width: 720px;
+            text-align: left;
+            border-left: 5px solid var(--primary-orange);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0.8rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        /* Fraction Math CSS */
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            text-align: center;
+            line-height: 1.1;
+        }
+
+        .math-numerator {
+            border-bottom: 2px solid currentColor;
+            padding: 0 5px;
+            width: 100%;
+        }
+
+        .math-denominator {
+            padding: 2px 5px 0 5px;
+            width: 100%;
+        }
+
+        /* Cancellation line-through for fractions */
+        .cancel-unit {
+            text-decoration: line-through;
+            color: var(--primary-red);
+            font-weight: bold;
+        }
+
+        /* Simulator CSS */
+        .sim-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 760px;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 5px;
+        }
+
+        .sim-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            text-align: left;
+        }
+
+        .sim-row label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary-blue-dark);
+            min-width: 140px;
+        }
+
+        .sim-row select, .sim-row input[type="range"] {
+            flex: 1;
+            padding: 6px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .sim-display {
+            background: white;
+            border: 2px dashed var(--primary-yellow);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 6to Primaria</span>
+            <span>Guía 21: Sistema Internacional vs Inglés</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div style="font-size: 70px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🇬🇧🇺🇸⚖️🌎</div>
+                    <h1 style="font-size: 2.2rem; margin-top: 10px;">Sistema Internacional vs Inglés</h1>
+                    <h2 style="font-weight: 600; color: #64748b; font-size: 1.5rem;">Guía Didáctica 21 &bull; 6&deg; Primaria</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 1rem;">Aprende las equivalencias y el factor de conversión para cambiar unidades inglesas al Sistema Internacional.</p>
+                </div>
+
+                <!-- Slide 2: Por qué dos sistemas -->
+                <div class="slide">
+                    <h2>¿Por qué existen dos sistemas de medición?</h2>
+                    <p style="margin-bottom: 10px;">Mientras que la mayoría del planeta adoptó el <strong>Sistema Internacional (Métrico)</strong> por ser decimal y sencillo, países como Estados Unidos y el Reino Unido conservan su <strong>Sistema Inglés (Imperial)</strong> tradicional.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-blue-dark); background: #f8fafc; font-size: 1.05rem;">
+                        <p><strong>¿Por qué debemos conocer ambos?</strong><br>
+                        Porque compramos pantallas medidas en <strong>pulgadas</strong>, importamos vehículos con velocidades en <strong>millas por hora</strong> o compramos productos químicos en <strong>galones</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Equivalencias de Longitud -->
+                <div class="slide">
+                    <h2>Equivalencias de Longitud</h2>
+                    <p style="margin-bottom: 10px;">Estas son las relaciones fundamentales de longitud entre ambos sistemas:</p>
+                    <div class="info-card" style="border-left-color: var(--primary-orange); background: #fffcf9; font-size: 1rem; line-height: 1.6; max-width: 600px;">
+                        📏 <strong>1 Pulgada (in)</strong> = 2.54 centímetros (cm)<br>
+                        🦶 <strong>1 Pie (ft)</strong> = 12 pulgadas = 30.48 cm (0.305 m)<br>
+                        📐 <strong>1 Yarda (yd)</strong> = 3 pies = 91.44 cm (0.914 m)<br>
+                        🛣️ <strong>1 Milla (mi)</strong> = 1,609 metros (1.609 km)
+                    </div>
+                </div>
+
+                <!-- Slide 4: Equivalencias de Masa y Capacidad -->
+                <div class="slide">
+                    <h2>Equivalencias de Masa y Capacidad</h2>
+                    <p style="margin-bottom: 10px;">Estas son las equivalencias fundamentales para peso y volumen de líquidos:</p>
+                    <div style="display: flex; gap: 15px; width: 100%; max-width: 760px; text-align: left; font-size: 0.95rem;">
+                        <div class="info-card" style="flex: 1; border-left-color: var(--primary-green); background: #f0fdf4; margin: 0;">
+                            <h3 style="color: #166534; margin-bottom: 5px;">Masa (Peso)</h3>
+                            ⚖️ <strong>1 Onza (oz)</strong> = 28.35 gramos (g)<br>
+                            📦 <strong>1 Libra (lb)</strong> = 16 onzas = 453.6 g (0.454 kg)
+                        </div>
+                        <div class="info-card" style="flex: 1; border-left-color: var(--primary-purple); background: #f5f3ff; margin: 0;">
+                            <h3 style="color: #5b21b6; margin-bottom: 5px;">Capacidad (Volumen)</h3>
+                            🧪 <strong>1 Onza líquida (fl oz)</strong> = 29.57 mililitros (mL)<br>
+                            🛢️ <strong>1 Galón (gal)</strong> = 3.785 litros (L)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Simulador interactivo -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 5px;">Simulador de Factor de Conversión ⚙️</h2>
+                    <p style="margin-bottom: 10px; font-size: 0.95rem;">Selecciona una situación cotidiana y usa el deslizador para ver cómo se calculan las equivalencias.</p>
+                    
+                    <div class="sim-layout">
+                        <div class="sim-row">
+                            <label>Reto Cotidiano:</label>
+                            <select id="sim-scenario" onchange="runSimConversion();">
+                                <option value="tv">Medir una pantalla de TV (Pulgadas ➔ cm)</option>
+                                <option value="gas">Llenar el tanque de gasolina (Galones ➔ Litros)</option>
+                                <option value="puppy">Pesar un costal de alimento (Libras ➔ kg)</option>
+                            </select>
+                        </div>
+                        <div class="sim-row">
+                            <label id="lbl-slider-val">Cantidad: 10</label>
+                            <input type="range" id="sim-slider" min="1" max="100" value="10" oninput="runSimConversion();">
+                        </div>
+                        <div class="sim-display" id="sim-math-display">
+                            Cálculo: ...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: QUIZ 1 -->
+                <div class="slide">
+                    <h2>Reto de Longitud</h2>
+                    <p style="margin-bottom: 10px;">Si la pantalla de una tableta mide exactamente <strong>10 pulgadas (in)</strong> de diagonal: ¿A cuántos <strong>centímetros (cm)</strong> equivale esta medida?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Dividiste en lugar de multiplicar. Pulgada es mayor que centímetro.')">A) 3.93 cm</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Multiplicamos 10 pulgadas × 2.54 cm/pulgada = 25.4 centímetros.', '')">B) 25.4 cm</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Te falló la coma decimal. 10 × 2.54 = 25.4.')">C) 254 cm</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 7: QUIZ 2 -->
+                <div class="slide">
+                    <h2>Reto de Capacidad</h2>
+                    <p style="margin-bottom: 10px;">Si compramos un recipiente de agua purificada de <strong>5 galones (gal)</strong> en el supermercado: ¿Cuántos <strong>litros (L)</strong> de agua contiene?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Eso sería en onzas líquidas, no galones. Recuerda el factor de galón a litros (3.785).')">A) 18.9 L</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Espectacular! Multiplicamos 5 galones × 3.785 L/galón = 18.925 litros.', '')">B) 18.925 L</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Dividiste. Para pasar de galón a litros se debe multiplicar.')">C) 1.32 L</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 8: QUIZ 3 -->
+                <div class="slide">
+                    <h2>Reto de Unidades</h2>
+                    <p style="margin-bottom: 10px;">¿Cuál de las siguientes es una unidad de <strong>capacidad (volumen)</strong> en el Sistema Inglés que se usa comúnmente en biberones y latas de bebidas?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'La onza (oz) es una unidad de masa (peso) equivalente a 28.35 g.')">A) Onza de peso (oz)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Extraordinario! La onza líquida (fl oz) mide volumen, equivalente a 29.57 mililitros.', '')">B) Onza líquida (fl oz)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'La libra (lb) mide masa o peso, equivalente a 453.6 g.')">C) Libra (lb)</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- Slide 9: Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Has completado con éxito todas las equivalencias entre el Sistema Internacional y el Inglés!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 9</span>
+        </div>
+        <div class="progress-bar-container" style="position: absolute; bottom: 0; left: 0; right: 0; height: 6px; background: #e2e8f0; z-index: 100;">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Conversion factors
+        const scenarios = {
+            tv: {
+                ratio: 2.54,
+                srcUnit: 'in',
+                destUnit: 'cm',
+                verb: 'Medir pantalla: '
+            },
+            gas: {
+                ratio: 3.785,
+                srcUnit: 'gal',
+                destUnit: 'L',
+                verb: 'Tanque lleno: '
+            },
+            puppy: {
+                ratio: 0.4536,
+                srcUnit: 'lb',
+                destUnit: 'kg',
+                verb: 'Peso costal: '
+            }
+        };
+
+        function runSimConversion() {
+            const sc = document.getElementById('sim-scenario').value;
+            const val = parseFloat(document.getElementById('sim-slider').value) || 0;
+            const data = scenarios[sc];
+            
+            document.getElementById('lbl-slider-val').innerText = `${data.verb} ${val} ${data.srcUnit}`;
+            
+            const result = val * data.ratio;
+            const mathDisplay = document.getElementById('sim-math-display');
+            
+            mathDisplay.innerHTML = `
+                Cálculo: ${val} <span class="cancel-unit">${data.srcUnit}</span> &times; 
+                <span class="math-fraction">
+                    <span class="math-numerator">${data.ratio} ${data.destUnit}</span>
+                    <span class="math-denominator">1 <span class="cancel-unit">${data.srcUnit}</span></span>
+                </span> = <strong>${result.toFixed(2).replace(/\.?0+$/, "")} ${data.destUnit}</strong>
+            `;
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#e2e8f0";
+            });
+            feedback.innerHTML = "";
+        }
+
+        runSimConversion();
+        updateGallery();
+    </script>
+</body>
+
+</html>
